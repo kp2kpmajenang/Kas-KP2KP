@@ -1440,7 +1440,7 @@ export default function DashboardPage() {
 
                 <div className="flex items-center gap-1.5 text-[#7B817D] mb-1">
 
-                  <span className="w-2 h-2 rounded-full bg-[#D9B83F]" />
+                  <span className="w-2 h-2 rounded-full bg-[#DC2626]" />
 
                   <span className="text-[11px] font-bold">
                     Pengeluaran
@@ -1448,7 +1448,7 @@ export default function DashboardPage() {
 
                 </div>
 
-                <div className="text-base sm:text-lg font-black text-[#A97800] tabular-nums">
+                <div className="text-base sm:text-lg font-black text-[#DC2626] tabular-nums">
                   {formatRupiah(
                     totalKeluar
                   )}
