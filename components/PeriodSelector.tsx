@@ -24,18 +24,23 @@ export default function PeriodSelector({
 }: PeriodSelectorProps) {
   return (
     <div
-      className={`inline-flex items-center gap-1.5 bg-amber-50 hover:bg-amber-100/70 border border-amber-200/90 rounded-full px-2.5 py-1 transition-colors ${className}`}
+      className={`inline-flex items-center gap-1.5 bg-[#FFF8D9] hover:bg-[#FFF3BE] border border-[#E8D58A] rounded-full px-2.5 py-1 transition-colors ${className}`}
     >
-      <Calendar className="w-3.5 h-3.5 text-amber-700 shrink-0" />
+      <Calendar className="w-3.5 h-3.5 text-[#8A6D00] shrink-0" />
+
       <select
         value={selectedPeriod}
         onChange={(e) => onChange(e.target.value)}
         disabled={disabled}
         aria-label="Pilih Periode Kas"
-        className="bg-transparent text-amber-950 font-bold text-xs outline-none cursor-pointer pr-1 py-0.5"
+        className="bg-transparent text-[#5E4C00] font-bold text-xs outline-none cursor-pointer pr-1 py-0.5"
       >
         {periods.map((item) => (
-          <option key={item.periode} value={item.periode} className="bg-white text-slate-800">
+          <option
+            key={item.periode}
+            value={item.periode}
+            className="bg-white text-[#183B38]"
+          >
             {item.label}
           </option>
         ))}
