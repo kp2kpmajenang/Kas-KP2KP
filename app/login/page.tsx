@@ -1,4 +1,3 @@
-```tsx
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
@@ -37,7 +36,7 @@ export default function LoginPage() {
   const [errorMessage, setErrorMessage] = useState('');
 
   // ============================================================
-  // LOAD USER UNTUK LAYER 1
+  // LOAD DAFTAR USER
   // ============================================================
 
   useEffect(() => {
@@ -104,7 +103,7 @@ export default function LoginPage() {
   }, []);
 
   // ============================================================
-  // USER GROUP
+  // PEMISAHAN USER
   // ============================================================
 
   const regularUsers = useMemo(() => {
@@ -120,7 +119,7 @@ export default function LoginPage() {
   }, [users]);
 
   // ============================================================
-  // HELPERS
+  // HELPER
   // ============================================================
 
   function getInitials(nama: string) {
@@ -170,7 +169,7 @@ export default function LoginPage() {
   }
 
   // ============================================================
-  // KEMBALI KE LAYER 1
+  // KEMBALI KE PILIHAN USER
   // ============================================================
 
   function backToUsers() {
@@ -224,7 +223,6 @@ export default function LoginPage() {
         return;
       }
 
-      // Login berhasil
       router.push('/dashboard');
       router.refresh();
     } catch (error) {
@@ -246,7 +244,7 @@ export default function LoginPage() {
     <main className="relative min-h-screen overflow-hidden bg-[#FFF9E8] text-[#183B38]">
 
       {/* ========================================================
-          BACKGROUND AMBIENCE
+          BACKGROUND
           ======================================================== */}
 
       <div
@@ -254,8 +252,8 @@ export default function LoginPage() {
         className="
           pointer-events-none
           absolute
-          -top-40
           -right-40
+          -top-40
           h-96
           w-96
           rounded-full
@@ -280,16 +278,16 @@ export default function LoginPage() {
       />
 
       {/* ========================================================
-          MAIN CONTAINER
+          CONTENT
           ======================================================== */}
 
       <div className="relative flex min-h-screen items-center justify-center px-4 py-8 sm:px-6 sm:py-12">
 
         <div className="w-full max-w-md">
 
-          {/* ======================================================
+          {/* ====================================================
               BRAND
-              ====================================================== */}
+              ==================================================== */}
 
           <div className="mb-7 text-center sm:mb-8">
 
@@ -318,7 +316,7 @@ export default function LoginPage() {
               className="
                 text-xl
                 font-black
-                tracking-[-0.02em]
+                tracking-tight
                 text-[#134E4A]
               "
             >
@@ -328,11 +326,12 @@ export default function LoginPage() {
             <p className="mt-0.5 text-sm font-medium text-[#7B817D]">
               Majenang
             </p>
+
           </div>
 
-          {/* ======================================================
-              LOGIN CARD
-              ====================================================== */}
+          {/* ====================================================
+              CARD
+              ==================================================== */}
 
           <section
             className="
@@ -346,22 +345,23 @@ export default function LoginPage() {
             "
           >
 
-            {/* ====================================================
-                LAYER 1 — PILIH AKUN
-                ==================================================== */}
+            {/* ==================================================
+                LAYER 1
+                ================================================== */}
 
             {!selectedUser && (
               <div
                 key="account-selection"
-                className="animate-login-in"
+                className="transition-all duration-200"
               >
 
                 <div className="mb-6">
+
                   <h2
                     className="
                       text-xl
                       font-black
-                      tracking-[-0.02em]
+                      tracking-tight
                       text-[#183B38]
                     "
                   >
@@ -371,6 +371,7 @@ export default function LoginPage() {
                   <p className="mt-1 text-sm text-[#7B817D]">
                     Pilih akun untuk melanjutkan.
                   </p>
+
                 </div>
 
                 {/* ERROR */}
@@ -395,7 +396,7 @@ export default function LoginPage() {
                   </div>
                 )}
 
-                {/* LOADING USER */}
+                {/* LOADING */}
 
                 {loadingUsers ? (
                   <div className="space-y-3">
@@ -415,7 +416,7 @@ export default function LoginPage() {
                   </div>
                 ) : regularUsers.length > 0 ? (
 
-                  /* USER LIST */
+                  /* USER CARDS */
 
                   <div className="space-y-3">
 
@@ -516,7 +517,7 @@ export default function LoginPage() {
 
                 ) : (
 
-                  /* EMPTY STATE */
+                  /* EMPTY */
 
                   <div
                     className="
@@ -603,6 +604,7 @@ export default function LoginPage() {
                               group-hover:translate-x-1
                             "
                           />
+
                         </button>
                       ))}
 
@@ -613,14 +615,14 @@ export default function LoginPage() {
               </div>
             )}
 
-            {/* ======================================================
-                LAYER 2 — PASSWORD
-                ====================================================== */}
+            {/* ==================================================
+                LAYER 2
+                ================================================== */}
 
             {selectedUser && (
               <div
                 key="password"
-                className="animate-login-in"
+                className="transition-all duration-200"
               >
 
                 {/* BACK */}
@@ -648,7 +650,7 @@ export default function LoginPage() {
                   Kembali
                 </button>
 
-                {/* SELECTED USER */}
+                {/* USER */}
 
                 <div className="mb-7 text-center">
 
@@ -675,7 +677,7 @@ export default function LoginPage() {
                     className="
                       text-lg
                       font-black
-                      tracking-[-0.01em]
+                      tracking-tight
                       text-[#183B38]
                     "
                   >
@@ -884,34 +886,6 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* ==========================================================
-          ANIMATION
-          ========================================================== */}
-
-      <style jsx global>{`
-        @keyframes loginFadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(6px);
-          }
-
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        .animate-login-in {
-          animation: loginFadeIn 220ms ease-out;
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-          .animate-login-in {
-            animation: none;
-          }
-        }
-      `}</style>
     </main>
   );
 }
-```
