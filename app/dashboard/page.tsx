@@ -386,56 +386,52 @@ export default function DashboardPage() {
      PERIOD
   ============================================================ */
 
-  useEffect(() => {
-    if (!currentUser) return;
+ useEffect(() => {
+  if (!currentUser) return;
 
-    async function loadPeriods() {
-      try {
-        const res = await fetch(
-          '/api/periods',
-          {
-            cache: 'no-store',
-          }
+  async function loadPeriods() {
+    try {
+      const res = await fetch('/api/periods', {
+        cache: 'no-store',
+      });
+
+      const data = await res.json();
+
+      if (
+        data.success &&
+        Array.isArray(data.data) &&
+        data.data.length > 0
+      ) {
+        setPeriods(data.data);
+
+        // Bulan berjalan
+        const now = new Date();
+
+        const currentPeriod =
+          `${now.getFullYear()}-${String(
+            now.getMonth() + 1
+          ).padStart(2, '0')}`;
+
+        // Cari apakah bulan berjalan tersedia
+        const currentPeriodExists = data.data.some(
+          (item: any) => item.periode === currentPeriod
         );
 
-        const data = await res.json();
-
-        if (
-          data.success &&
-          Array.isArray(data.data) &&
-          data.data.length > 0
-        ) {
-          setPeriods(data.data);
-
-          /*
-           * Jangan bergantung pada new Date()
-           * untuk menentukan selectedPeriod.
-           *
-           * Gunakan periode yang tersedia di sistem.
-           */
-          const availablePeriods =
-            data.data as {
-              periode: string;
-              label: string;
-            }[];
-
-          const fallbackPeriod =
-            availablePeriods[0]?.periode || '';
-
-          setSelectedPeriod(
-            fallbackPeriod
-          );
+        if (currentPeriodExists) {
+          // Otomatis buka bulan berjalan
+          setSelectedPeriod(currentPeriod);
+        } else {
+          // Jika belum tersedia, gunakan periode terbaru/pertama
+          setSelectedPeriod(data.data[0].periode);
         }
-      } catch (err) {
-        console.error(
-          'Error loading periods:',
-          err
-        );
       }
+    } catch (err) {
+      console.error('Error loading periods:', err);
     }
+  }
 
-    loadPeriods();
-  }, [currentUser]);
+  loadPeriods();
+}, [currentUser]);
 
   /* ============================================================
      CURRENT PERIOD DATA
