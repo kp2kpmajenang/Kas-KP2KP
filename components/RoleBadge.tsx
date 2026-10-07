@@ -5,20 +5,25 @@ interface RoleBadgeProps {
   className?: string;
 }
 
-export default function RoleBadge({ roles, className = '' }: RoleBadgeProps) {
+export default function RoleBadge({
+  roles,
+  className = '',
+}: RoleBadgeProps) {
   const roleList = Array.isArray(roles) ? roles : [roles];
 
   return (
-    <div className={`inline-flex flex-wrap items-center gap-1 ${className}`}>
+    <div
+      className={`inline-flex flex-wrap items-center gap-1 ${className}`}
+    >
       {roleList.map((role) => {
         const isSuper = role.includes('SUPER ADMIN');
         const isBendahara = role.includes('BENDAHARA');
 
         const badgeClass = isSuper
-          ? 'bg-amber-100 text-amber-900 border-amber-200'
+          ? 'bg-[#F7E7A8]/70 text-[#725B00] border-[#E5CD70]'
           : isBendahara
-          ? 'bg-blue-100 text-blue-900 border-blue-200'
-          : 'bg-slate-100 text-slate-700 border-slate-200';
+          ? 'bg-[#E4F3F0] text-[#0F625C] border-[#C5E4DE]'
+          : 'bg-[#F2F3EE] text-[#59635F] border-[#E1E4DD]';
 
         return (
           <span
