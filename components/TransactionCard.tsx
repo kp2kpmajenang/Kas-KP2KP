@@ -45,12 +45,15 @@ export default function TransactionCard({
       {/* Details */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1.5 flex-wrap">
-          <span className="text-xs sm:text-sm font-bold text-[#233E3A] truncate">
+          <span
+            title={transaction.uraian}
+            className="text-xs sm:text-sm font-bold text-[#233E3A] truncate"
+          >
             {transaction.uraian}
           </span>
 
           {isBatal && (
-            <span className="text-[9px] font-black uppercase px-1.5 py-0.5 bg-[#F1EEEE] text-[#8C6A6A] rounded-sm">
+            <span className="text-[9px] font-black uppercase px-1.5 py-0.5 bg-[#F1EEEE] text-[#8C6A6A] rounded-sm shrink-0">
               BATAL
             </span>
           )}
@@ -59,13 +62,16 @@ export default function TransactionCard({
         <div className="text-[11px] text-[#7F8985] flex items-center gap-2 mt-0.5">
           <span>{transaction.tanggal}</span>
           <span>•</span>
-          <span className="font-mono text-[10px] text-[#A0A7A3]">
+          <span className="font-mono text-[10px] text-[#A0A7A3] truncate">
             {transaction.idTransaksi}
           </span>
         </div>
 
         {transaction.keterangan && (
-          <div className="text-[10px] text-[#9AA19D] italic truncate mt-0.5">
+          <div
+            title={transaction.keterangan}
+            className="text-[10px] text-[#9AA19D] italic truncate mt-0.5"
+          >
             {transaction.keterangan}
           </div>
         )}
@@ -91,6 +97,7 @@ export default function TransactionCard({
             type="button"
             onClick={() => onCancel(transaction.idTransaksi)}
             className="mt-1 text-[10px] font-bold text-[#B85454] hover:text-[#923D3D] bg-[#FBEDED] hover:bg-[#F6DDDD] px-2 py-0.5 rounded-md inline-flex items-center gap-1 transition-colors"
+            title="Batalkan transaksi"
           >
             <XCircle className="w-3 h-3" />
             <span>Batal</span>
