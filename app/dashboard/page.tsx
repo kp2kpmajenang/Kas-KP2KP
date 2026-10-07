@@ -386,52 +386,48 @@ export default function DashboardPage() {
      PERIOD
   ============================================================ */
 
- useEffect(() => {
-  if (!currentUser) return;
+  useEffect(() => {
+    if (!currentUser) return;
 
-  async function loadPeriods() {
-    try {
-      const res = await fetch('/api/periods', {
-        cache: 'no-store',
-      });
+    async function loadPeriods() {
+      try {
+        const res = await fetch('/api/periods', {
+          cache: 'no-store',
+        });
 
-      const data = await res.json();
+        const data = await res.json();
 
-      if (
-        data.success &&
-        Array.isArray(data.data) &&
-        data.data.length > 0
-      ) {
-        setPeriods(data.data);
+        if (
+          data.success &&
+          Array.isArray(data.data) &&
+          data.data.length > 0
+        ) {
+          setPeriods(data.data);
 
-        // Bulan berjalan
-        const now = new Date();
+          const now = new Date();
 
-        const currentPeriod =
-          `${now.getFullYear()}-${String(
-            now.getMonth() + 1
-          ).padStart(2, '0')}`;
+          const currentPeriod =
+            `${now.getFullYear()}-${String(
+              now.getMonth() + 1
+            ).padStart(2, '0')}`;
 
-        // Cari apakah bulan berjalan tersedia
-        const currentPeriodExists = data.data.some(
-          (item: any) => item.periode === currentPeriod
-        );
+          const currentPeriodExists = data.data.some(
+            (item: any) => item.periode === currentPeriod
+          );
 
-        if (currentPeriodExists) {
-          // Otomatis buka bulan berjalan
-          setSelectedPeriod(currentPeriod);
-        } else {
-          // Jika belum tersedia, gunakan periode terbaru/pertama
-          setSelectedPeriod(data.data[0].periode);
+          if (currentPeriodExists) {
+            setSelectedPeriod(currentPeriod);
+          } else {
+            setSelectedPeriod(data.data[0].periode);
+          }
         }
+      } catch (err) {
+        console.error('Error loading periods:', err);
       }
-    } catch (err) {
-      console.error('Error loading periods:', err);
     }
-  }
 
-  loadPeriods();
-}, [currentUser]);
+    loadPeriods();
+  }, [currentUser]);
 
   /* ============================================================
      CURRENT PERIOD DATA
@@ -510,22 +506,6 @@ export default function DashboardPage() {
   /* ============================================================
      ANNUAL ANALYSIS
   ============================================================ */
-
-  /*
-   * PENTING:
-   *
-   * Sebelumnya:
-   *
-   * const selectedYear =
-   *   selectedPeriod
-   *     ? Number(selectedPeriod.slice(0, 4))
-   *     : new Date().getFullYear();
-   *
-   * Kita hilangkan new Date() dari render.
-   *
-   * Karena aplikasi mulai pada periode 2026,
-   * fallback yang aman adalah 2026.
-   */
 
   const selectedYear = (() => {
     if (!selectedPeriod) {
@@ -1440,7 +1420,7 @@ export default function DashboardPage() {
 
                 <div className="flex items-center gap-1.5 text-[#7B817D] mb-1">
 
-                  <span className="w-2 h-2 rounded-full bg-[#DC2626]" />
+                  <span className="w-2 h-2 rounded-full bg-[#C65B5B]" />
 
                   <span className="text-[11px] font-bold">
                     Pengeluaran
@@ -1448,7 +1428,7 @@ export default function DashboardPage() {
 
                 </div>
 
-                <div className="text-base sm:text-lg font-black text-[#DC2626] tabular-nums">
+                <div className="text-base sm:text-lg font-black text-[#C65B5B] tabular-nums">
                   {formatRupiah(
                     totalKeluar
                   )}
@@ -1861,7 +1841,7 @@ export default function DashboardPage() {
                       </span>
 
                       <span className="flex items-center gap-1">
-                        <span className="w-2 h-2 rounded-full bg-[#D9B83F]" />
+                        <span className="w-2 h-2 rounded-full bg-[#C65B5B]" />
                         Keluar
                       </span>
 
@@ -1906,7 +1886,7 @@ export default function DashboardPage() {
                         Total Keluar
                       </div>
 
-                      <div className="text-xs sm:text-sm font-black text-[#A97800] mt-1 tabular-nums">
+                      <div className="text-xs sm:text-sm font-black text-[#C65B5B] mt-1 tabular-nums">
                         {formatRupiah(
                           annualTotalKeluar
                         )}
@@ -2033,7 +2013,7 @@ export default function DashboardPage() {
                                       {/* KELUAR */}
 
                                       <div
-                                        className="group relative w-3.5 sm:w-5 rounded-t-md bg-[#D9B83F] transition-all duration-500 hover:bg-[#B99724]"
+                                        className="group relative w-3.5 sm:w-5 rounded-t-md bg-[#C65B5B] transition-all duration-500 hover:bg-[#B85454]"
                                         style={{
                                           height: `${keluarHeight}%`,
                                         }}
@@ -2200,7 +2180,7 @@ export default function DashboardPage() {
                       {persenKeluar}%)
                     </span>
 
-                    <span className="text-[#A97800]">
+                    <span className="text-[#C65B5B]">
                       {formatRupiah(
                         totalKeluar
                       )}
@@ -2211,7 +2191,7 @@ export default function DashboardPage() {
                   <div className="w-full h-2 rounded-full bg-[#E9E4CF] overflow-hidden">
 
                     <div
-                      className="h-full bg-[#D9B83F] rounded-full transition-all duration-500"
+                      className="h-full bg-[#C65B5B] rounded-full transition-all duration-500"
                       style={{
                         width: `${Math.min(
                           100,
