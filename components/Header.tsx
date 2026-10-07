@@ -147,7 +147,7 @@ export default function Header({
     <header className="sticky top-0 z-40 bg-[#FFF9E8]/92 backdrop-blur-xl border-b border-[#E9E4CF] px-4 py-2.5 shadow-[0_4px_20px_rgba(19,78,74,0.05)]">
       <div className="max-w-2xl mx-auto flex items-center justify-between gap-3">
 
-        {/* KAS KP2KP + USER INFO */}
+        {/* LOGO + USER INFO */}
         <div className="flex items-center gap-2.5 min-w-0">
 
           <KasLogo />
@@ -164,11 +164,8 @@ export default function Header({
 
               <RoleBadge roles={roles} />
             </div>
-
-            <div className="hidden sm:block text-[9px] font-bold tracking-[0.12em] text-[#0F766E]/70 uppercase mt-0.5">
-              KAS KP2KP Majenang
-            </div>
           </div>
+
         </div>
 
         {/* PERIODE */}
@@ -179,6 +176,7 @@ export default function Header({
             onChange={onPeriodChange}
           />
         )}
+
       </div>
     </header>
   );
