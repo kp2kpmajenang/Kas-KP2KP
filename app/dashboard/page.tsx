@@ -187,7 +187,10 @@ const NAMA_BULAN = [
 export default function DashboardPage() {
   const router = useRouter();
 
-  // Auth State
+  /* ============================================================
+     AUTH STATE
+  ============================================================ */
+
   const [currentUser, setCurrentUser] = useState<{
     username: string;
     nama: string;
@@ -197,11 +200,17 @@ export default function DashboardPage() {
   const [authLoading, setAuthLoading] = useState(true);
   const [loggingOut, setLoggingOut] = useState(false);
 
-  // Tab State
+  /* ============================================================
+     TAB STATE
+  ============================================================ */
+
   const [activeTab, setActiveTab] =
     useState<NavTab>('beranda');
 
-  // Period State
+  /* ============================================================
+     PERIOD STATE
+  ============================================================ */
+
   const [periods, setPeriods] = useState<
     { periode: string; label: string }[]
   >([]);
@@ -209,7 +218,10 @@ export default function DashboardPage() {
   const [selectedPeriod, setSelectedPeriod] =
     useState<string>('');
 
-  // Finance State
+  /* ============================================================
+     FINANCE STATE
+  ============================================================ */
+
   const [dashboardData, setDashboardData] =
     useState<DashboardKasResult | null>(null);
 
@@ -219,14 +231,20 @@ export default function DashboardPage() {
   const [dataLoading, setDataLoading] =
     useState(false);
 
-  // Annual Analysis State
+  /* ============================================================
+     ANNUAL ANALYSIS STATE
+  ============================================================ */
+
   const [annualCashData, setAnnualCashData] =
     useState<MonthlyCashData[]>([]);
 
   const [annualLoading, setAnnualLoading] =
     useState(false);
 
-  // Filter State
+  /* ============================================================
+     FILTER STATE
+  ============================================================ */
+
   const [searchTx, setSearchTx] = useState('');
 
   const [filterJenisTx, setFilterJenisTx] =
@@ -234,7 +252,10 @@ export default function DashboardPage() {
       'SEMUA'
     );
 
-  // Admin Data State
+  /* ============================================================
+     ADMIN STATE
+  ============================================================ */
+
   const [usersList, setUsersList] =
     useState<any[]>([]);
 
@@ -244,13 +265,20 @@ export default function DashboardPage() {
   const [adminLoading, setAdminLoading] =
     useState(false);
 
+  /* ============================================================
+     AUDIT FILTER
+  ============================================================ */
+
   const [auditSearch, setAuditSearch] =
     useState('');
 
   const [auditFilterAksi, setAuditFilterAksi] =
     useState('SEMUA');
 
-  // Modal States
+  /* ============================================================
+     MODAL STATE
+  ============================================================ */
+
   const [modalTxOpen, setModalTxOpen] =
     useState(false);
 
@@ -285,7 +313,10 @@ export default function DashboardPage() {
   const [submitting, setSubmitting] =
     useState(false);
 
-  // Toast State
+  /* ============================================================
+     TOAST
+  ============================================================ */
+
   const [toast, setToast] =
     useState<ToastData | null>(null);
 
@@ -294,21 +325,31 @@ export default function DashboardPage() {
     message: string,
     title?: string
   ) {
-    setToast({ type, message, title });
+    setToast({
+      type,
+      message,
+      title,
+    });
 
-    setTimeout(() => setToast(null), 3500);
+    setTimeout(
+      () => setToast(null),
+      3500
+    );
   }
 
   /* ============================================================
      AUTH
-     ============================================================ */
+  ============================================================ */
 
   useEffect(() => {
     async function checkAuth() {
       try {
-        const res = await fetch('/api/auth/me', {
-          cache: 'no-store',
-        });
+        const res = await fetch(
+          '/api/auth/me',
+          {
+            cache: 'no-store',
+          }
+        );
 
         const data = await res.json();
 
@@ -334,6 +375,7 @@ export default function DashboardPage() {
 
     if (pendingTab) {
       setActiveTab(pendingTab);
+
       sessionStorage.removeItem(
         'dashboard_tab'
       );
@@ -342,16 +384,19 @@ export default function DashboardPage() {
 
   /* ============================================================
      PERIOD
-     ============================================================ */
+  ============================================================ */
 
   useEffect(() => {
     if (!currentUser) return;
 
     async function loadPeriods() {
       try {
-        const res = await fetch('/api/periods', {
-          cache: 'no-store',
-        });
+        const res = await fetch(
+          '/api/periods',
+          {
+            cache: 'no-store',
+          }
+        );
 
         const data = await res.json();
 
@@ -362,22 +407,23 @@ export default function DashboardPage() {
         ) {
           setPeriods(data.data);
 
-          const now = new Date();
+          /*
+           * Jangan bergantung pada new Date()
+           * untuk menentukan selectedPeriod.
+           *
+           * Gunakan periode yang tersedia di sistem.
+           */
+          const availablePeriods =
+            data.data as {
+              periode: string;
+              label: string;
+            }[];
 
-          const thisMonth =
-            `${now.getFullYear()}-${String(
-              now.getMonth() + 1
-            ).padStart(2, '0')}`;
-
-          const found = data.data.some(
-            (item: any) =>
-              item.periode === thisMonth
-          );
+          const fallbackPeriod =
+            availablePeriods[0]?.periode || '';
 
           setSelectedPeriod(
-            found
-              ? thisMonth
-              : data.data[0].periode
+            fallbackPeriod
           );
         }
       } catch (err) {
@@ -393,7 +439,7 @@ export default function DashboardPage() {
 
   /* ============================================================
      CURRENT PERIOD DATA
-     ============================================================ */
+  ============================================================ */
 
   const loadPeriodData = useCallback(
     async (period: string) => {
@@ -402,26 +448,28 @@ export default function DashboardPage() {
       setDataLoading(true);
 
       try {
-        const [dashRes, txRes] =
-          await Promise.all([
-            fetch(
-              `/api/dashboard?periode=${encodeURIComponent(
-                period
-              )}`,
-              {
-                cache: 'no-store',
-              }
-            ),
+        const [
+          dashRes,
+          txRes,
+        ] = await Promise.all([
+          fetch(
+            `/api/dashboard?periode=${encodeURIComponent(
+              period
+            )}`,
+            {
+              cache: 'no-store',
+            }
+          ),
 
-            fetch(
-              `/api/transactions?periode=${encodeURIComponent(
-                period
-              )}`,
-              {
-                cache: 'no-store',
-              }
-            ),
-          ]);
+          fetch(
+            `/api/transactions?periode=${encodeURIComponent(
+              period
+            )}`,
+            {
+              cache: 'no-store',
+            }
+          ),
+        ]);
 
         const dashData =
           await dashRes.json();
@@ -454,7 +502,9 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (selectedPeriod) {
-      loadPeriodData(selectedPeriod);
+      loadPeriodData(
+        selectedPeriod
+      );
     }
   }, [
     selectedPeriod,
@@ -463,123 +513,176 @@ export default function DashboardPage() {
 
   /* ============================================================
      ANNUAL ANALYSIS
-     ============================================================ */
+  ============================================================ */
 
-  const selectedYear =
-    selectedPeriod
-      ? Number(selectedPeriod.slice(0, 4))
-      : new Date().getFullYear();
+  /*
+   * PENTING:
+   *
+   * Sebelumnya:
+   *
+   * const selectedYear =
+   *   selectedPeriod
+   *     ? Number(selectedPeriod.slice(0, 4))
+   *     : new Date().getFullYear();
+   *
+   * Kita hilangkan new Date() dari render.
+   *
+   * Karena aplikasi mulai pada periode 2026,
+   * fallback yang aman adalah 2026.
+   */
+
+  const selectedYear = (() => {
+    if (!selectedPeriod) {
+      return 2026;
+    }
+
+    const year = Number(
+      selectedPeriod.slice(0, 4)
+    );
+
+    if (
+      Number.isFinite(year) &&
+      year >= 2000 &&
+      year <= 2100
+    ) {
+      return year;
+    }
+
+    return 2026;
+  })();
 
   const loadAnnualCashData =
-    useCallback(async (year: number) => {
-      setAnnualLoading(true);
+    useCallback(
+      async (year: number) => {
+        setAnnualLoading(true);
 
-      try {
-        const monthRequests =
-          Array.from(
-            { length: 12 },
-            (_, index) => {
-              const month =
-                String(index + 1).padStart(
-                  2,
-                  '0'
+        try {
+          const monthRequests =
+            Array.from(
+              {
+                length: 12,
+              },
+              (_, index) => {
+                const month =
+                  String(
+                    index + 1
+                  ).padStart(
+                    2,
+                    '0'
+                  );
+
+                const periode =
+                  `${year}-${month}`;
+
+                return fetch(
+                  `/api/transactions?periode=${encodeURIComponent(
+                    periode
+                  )}`,
+                  {
+                    cache: 'no-store',
+                  }
+                )
+                  .then(
+                    async (res) => {
+                      if (!res.ok) {
+                        return {
+                          periode,
+                          transactions: [],
+                        };
+                      }
+
+                      const result =
+                        await res.json();
+
+                      return {
+                        periode,
+                        transactions:
+                          result.success &&
+                          Array.isArray(
+                            result.data
+                          )
+                            ? result.data
+                            : [],
+                      };
+                    }
+                  )
+                  .catch(
+                    () => ({
+                      periode,
+                      transactions: [],
+                    })
+                  );
+              }
+            );
+
+          const monthlyResults =
+            await Promise.all(
+              monthRequests
+            );
+
+          const result: MonthlyCashData[] =
+            monthlyResults.map(
+              (
+                monthResult,
+                index
+              ) => {
+                let masuk = 0;
+                let keluar = 0;
+
+                monthResult.transactions.forEach(
+                  (tx: any) => {
+                    const nominal =
+                      Number(
+                        tx?.nominal
+                      ) || 0;
+
+                    if (
+                      tx?.jenis ===
+                      'MASUK'
+                    ) {
+                      masuk +=
+                        nominal;
+                    }
+
+                    if (
+                      tx?.jenis ===
+                      'KELUAR'
+                    ) {
+                      keluar +=
+                        nominal;
+                    }
+                  }
                 );
 
-              const periode =
-                `${year}-${month}`;
-
-              return fetch(
-                `/api/transactions?periode=${encodeURIComponent(
-                  periode
-                )}`,
-                {
-                  cache: 'no-store',
-                }
-              ).then(async (res) => {
-                if (!res.ok) {
-                  return {
-                    periode,
-                    transactions: [],
-                  };
-                }
-
-                const result =
-                  await res.json();
-
                 return {
-                  periode,
-                  transactions:
-                    result.success &&
-                    Array.isArray(
-                      result.data
-                    )
-                      ? result.data
-                      : [],
+                  bulan:
+                    NAMA_BULAN[
+                      index
+                    ],
+                  periode:
+                    monthResult.periode,
+                  masuk,
+                  keluar,
                 };
-              });
-            }
+              }
+            );
+
+          setAnnualCashData(
+            result
+          );
+        } catch (error) {
+          console.error(
+            'Error loading annual cash data:',
+            error
           );
 
-        const monthlyResults =
-          await Promise.all(
-            monthRequests
-          );
-
-        const result: MonthlyCashData[] =
-          monthlyResults.map(
-            (
-              monthResult,
-              index
-            ) => {
-              let masuk = 0;
-              let keluar = 0;
-
-              monthResult.transactions.forEach(
-                (tx: any) => {
-                  const nominal =
-                    Number(
-                      tx.nominal
-                    ) || 0;
-
-                  if (
-                    tx.jenis ===
-                    'MASUK'
-                  ) {
-                    masuk += nominal;
-                  }
-
-                  if (
-                    tx.jenis ===
-                    'KELUAR'
-                  ) {
-                    keluar += nominal;
-                  }
-                }
-              );
-
-              return {
-                bulan:
-                  NAMA_BULAN[index],
-                periode:
-                  monthResult.periode,
-                masuk,
-                keluar,
-              };
-            }
-          );
-
-        setAnnualCashData(result);
-      } catch (error) {
-        console.error(
-          'Error loading annual cash data:',
-          error
-        );
-
-        setAnnualCashData([]);
-      } finally {
-        setAnnualLoading(false);
-      }
-    }, []);
+          setAnnualCashData([]);
+        } finally {
+          setAnnualLoading(false);
+        }
+      },
+      []
+    );
 
   useEffect(() => {
     if (
@@ -601,7 +704,7 @@ export default function DashboardPage() {
 
   /* ============================================================
      ADMIN DATA
-     ============================================================ */
+  ============================================================ */
 
   const isSuperAdmin =
     currentUser?.roles?.includes(
@@ -621,13 +724,19 @@ export default function DashboardPage() {
       setAdminLoading(true);
 
       Promise.all([
-        fetch('/api/users', {
-          cache: 'no-store',
-        }),
+        fetch(
+          '/api/users',
+          {
+            cache: 'no-store',
+          }
+        ),
 
-        fetch('/api/audit-log', {
-          cache: 'no-store',
-        }),
+        fetch(
+          '/api/audit-log',
+          {
+            cache: 'no-store',
+          }
+        ),
       ])
         .then(
           async ([
@@ -655,7 +764,9 @@ export default function DashboardPage() {
         )
         .catch(console.error)
         .finally(() =>
-          setAdminLoading(false)
+          setAdminLoading(
+            false
+          )
         );
     }
   }, [
@@ -665,7 +776,7 @@ export default function DashboardPage() {
 
   /* ============================================================
      TRANSACTION HANDLERS
-     ============================================================ */
+  ============================================================ */
 
   function handleOpenTxModal(
     type: 'MASUK' | 'KELUAR'
@@ -692,7 +803,9 @@ export default function DashboardPage() {
     if (
       !txForm.uraian ||
       !txForm.nominal ||
-      Number(txForm.nominal) <= 0
+      Number(
+        txForm.nominal
+      ) <= 0
     ) {
       showToast(
         'error',
@@ -705,31 +818,36 @@ export default function DashboardPage() {
     setSubmitting(true);
 
     try {
-      const res = await fetch(
-        '/api/transactions',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type':
-              'application/json',
-          },
+      const res =
+        await fetch(
+          '/api/transactions',
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type':
+                'application/json',
+            },
 
-          body: JSON.stringify({
-            tanggal:
-              txForm.tanggal,
-            jenis:
-              txForm.jenis,
-            uraian:
-              txForm.uraian,
-            nominal:
-              Number(
-                txForm.nominal
-              ),
-            keterangan:
-              txForm.keterangan,
-          }),
-        }
-      );
+            body: JSON.stringify({
+              tanggal:
+                txForm.tanggal,
+
+              jenis:
+                txForm.jenis,
+
+              uraian:
+                txForm.uraian,
+
+              nominal:
+                Number(
+                  txForm.nominal
+                ),
+
+              keterangan:
+                txForm.keterangan,
+            }),
+          }
+        );
 
       const result =
         await res.json();
@@ -788,14 +906,15 @@ export default function DashboardPage() {
     }
 
     try {
-      const res = await fetch(
-        `/api/transactions/${encodeURIComponent(
-          id
-        )}/cancel`,
-        {
-          method: 'POST',
-        }
-      );
+      const res =
+        await fetch(
+          `/api/transactions/${encodeURIComponent(
+            id
+          )}/cancel`,
+          {
+            method: 'POST',
+          }
+        );
 
       const result =
         await res.json();
@@ -840,20 +959,21 @@ export default function DashboardPage() {
 
   /* ============================================================
      SALDO AWAL
-     ============================================================ */
+  ============================================================ */
 
   async function handleOpenSaldoModal() {
     if (!selectedPeriod) return;
 
     try {
-      const res = await fetch(
-        `/api/balance/opening?periode=${encodeURIComponent(
-          selectedPeriod
-        )}`,
-        {
-          cache: 'no-store',
-        }
-      );
+      const res =
+        await fetch(
+          `/api/balance/opening?periode=${encodeURIComponent(
+            selectedPeriod
+          )}`,
+          {
+            cache: 'no-store',
+          }
+        );
 
       const data =
         await res.json();
@@ -866,12 +986,14 @@ export default function DashboardPage() {
           saldoAwal:
             String(
               data.data
-                .saldoAwal || 0
+                .saldoAwal ||
+                0
             ),
 
           keterangan:
             data.data
-              .keterangan || '',
+              .keterangan ||
+            '',
         });
 
         setModalSaldoOpen(
@@ -894,29 +1016,30 @@ export default function DashboardPage() {
     setSubmitting(true);
 
     try {
-      const res = await fetch(
-        '/api/balance/opening',
-        {
-          method: 'PUT',
-          headers: {
-            'Content-Type':
-              'application/json',
-          },
+      const res =
+        await fetch(
+          '/api/balance/opening',
+          {
+            method: 'PUT',
+            headers: {
+              'Content-Type':
+                'application/json',
+            },
 
-          body: JSON.stringify({
-            periode:
-              saldoForm.periode,
+            body: JSON.stringify({
+              periode:
+                saldoForm.periode,
 
-            saldoAwal:
-              Number(
-                saldoForm.saldoAwal
-              ),
+              saldoAwal:
+                Number(
+                  saldoForm.saldoAwal
+                ),
 
-            keterangan:
-              saldoForm.keterangan,
-          }),
-        }
-      );
+              keterangan:
+                saldoForm.keterangan,
+            }),
+          }
+        );
 
       const result =
         await res.json();
@@ -958,7 +1081,7 @@ export default function DashboardPage() {
 
   /* ============================================================
      USER HANDLER
-     ============================================================ */
+  ============================================================ */
 
   async function handleSaveUser(
     e: React.FormEvent
@@ -968,34 +1091,35 @@ export default function DashboardPage() {
     setSubmitting(true);
 
     try {
-      const res = await fetch(
-        '/api/users',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type':
-              'application/json',
-          },
+      const res =
+        await fetch(
+          '/api/users',
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type':
+                'application/json',
+            },
 
-          body: JSON.stringify({
-            nama:
-              userForm.nama,
+            body: JSON.stringify({
+              nama:
+                userForm.nama,
 
-            username:
-              userForm.username,
+              username:
+                userForm.username,
 
-            password:
-              userForm.password,
+              password:
+                userForm.password,
 
-            roles: [
-              userForm.role,
-            ],
+              roles: [
+                userForm.role,
+              ],
 
-            status:
-              userForm.status,
-          }),
-        }
-      );
+              status:
+                userForm.status,
+            }),
+          }
+        );
 
       const result =
         await res.json();
@@ -1052,7 +1176,7 @@ export default function DashboardPage() {
 
   /* ============================================================
      LOGOUT
-     ============================================================ */
+  ============================================================ */
 
   async function handleLogout() {
     if (loggingOut) return;
@@ -1067,13 +1191,14 @@ export default function DashboardPage() {
     setLoggingOut(true);
 
     try {
-      const res = await fetch(
-        '/api/auth/logout',
-        {
-          method: 'POST',
-          cache: 'no-store',
-        }
-      );
+      const res =
+        await fetch(
+          '/api/auth/logout',
+          {
+            method: 'POST',
+            cache: 'no-store',
+          }
+        );
 
       if (!res.ok) {
         throw new Error(
@@ -1094,7 +1219,7 @@ export default function DashboardPage() {
 
   /* ============================================================
      LOADING
-     ============================================================ */
+  ============================================================ */
 
   if (authLoading) {
     return (
@@ -1107,7 +1232,7 @@ export default function DashboardPage() {
 
   /* ============================================================
      FILTER TRANSACTIONS
-     ============================================================ */
+  ============================================================ */
 
   const filteredTransactions =
     transactions.filter(
@@ -1182,7 +1307,7 @@ export default function DashboardPage() {
 
   /* ============================================================
      ANNUAL GRAPH CALCULATIONS
-     ============================================================ */
+  ============================================================ */
 
   const annualTotalMasuk =
     annualCashData.reduce(
@@ -1216,7 +1341,10 @@ export default function DashboardPage() {
   const highestMonth =
     annualCashData.length > 0
       ? annualCashData.reduce(
-          (highest, current) =>
+          (
+            highest,
+            current
+          ) =>
             current.masuk +
               current.keluar >
             highest.masuk +
@@ -1289,12 +1417,15 @@ export default function DashboardPage() {
             <div className="grid grid-cols-2 gap-3">
 
               <div className="bg-white p-3.5 rounded-2xl border border-[#E9E4CF] shadow-[0_4px_18px_rgba(19,78,74,0.04)]">
+
                 <div className="flex items-center gap-1.5 text-[#7B817D] mb-1">
+
                   <span className="w-2 h-2 rounded-full bg-[#0F766E]" />
 
                   <span className="text-[11px] font-bold">
                     Pemasukan
                   </span>
+
                 </div>
 
                 <div className="text-base sm:text-lg font-black text-[#0F766E] tabular-nums">
@@ -1306,15 +1437,19 @@ export default function DashboardPage() {
                 <div className="text-[10px] text-[#7B817D] mt-0.5">
                   {persenMasuk}% arus kas
                 </div>
+
               </div>
 
               <div className="bg-white p-3.5 rounded-2xl border border-[#E9E4CF] shadow-[0_4px_18px_rgba(19,78,74,0.04)]">
+
                 <div className="flex items-center gap-1.5 text-[#7B817D] mb-1">
+
                   <span className="w-2 h-2 rounded-full bg-[#D9B83F]" />
 
                   <span className="text-[11px] font-bold">
                     Pengeluaran
                   </span>
+
                 </div>
 
                 <div className="text-base sm:text-lg font-black text-[#A97800] tabular-nums">
@@ -1326,6 +1461,7 @@ export default function DashboardPage() {
                 <div className="text-[10px] text-[#7B817D] mt-0.5">
                   {persenKeluar}% arus kas
                 </div>
+
               </div>
 
             </div>
@@ -1374,6 +1510,7 @@ export default function DashboardPage() {
               ) : (
                 <>
                   <div className="space-y-2.5 sm:hidden">
+
                     {filteredTransactions
                       .slice(0, 5)
                       .map(
@@ -1394,9 +1531,11 @@ export default function DashboardPage() {
                           />
                         )
                       )}
+
                   </div>
 
                   <div className="hidden sm:block">
+
                     <TransactionTable
                       transactions={filteredTransactions.slice(
                         0,
@@ -1409,10 +1548,13 @@ export default function DashboardPage() {
                         handleCancelTransaction
                       }
                     />
+
                   </div>
                 </>
               )}
+
             </div>
+
           </div>
         )}
 
@@ -1429,6 +1571,7 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between flex-wrap gap-2">
 
                 <div>
+
                   <h3 className="text-sm font-black text-[#183B38]">
                     Semua Mutasi Kas
                   </h3>
@@ -1443,6 +1586,7 @@ export default function DashboardPage() {
                     }{' '}
                     data)
                   </p>
+
                 </div>
 
                 {isBendahara && (
@@ -1460,6 +1604,7 @@ export default function DashboardPage() {
                     <span>
                       Catat Transaksi
                     </span>
+
                   </button>
                 )}
 
@@ -1484,10 +1629,13 @@ export default function DashboardPage() {
                     filterJenisTx
                   }
                   onChange={(
-                    e: any
+                    e
                   ) =>
                     setFilterJenisTx(
-                      e.target.value
+                      e.target.value as
+                        | 'SEMUA'
+                        | 'MASUK'
+                        | 'KELUAR'
                     )
                   }
                   className="h-9 px-2.5 rounded-xl border border-[#E9E4CF] bg-[#FFFDF4] text-xs font-bold text-[#183B38] outline-none"
@@ -1517,6 +1665,7 @@ export default function DashboardPage() {
               ) : (
                 <>
                   <div className="space-y-2.5 sm:hidden">
+
                     {filteredTransactions.map(
                       (tx) => (
                         <TransactionCard
@@ -1535,9 +1684,11 @@ export default function DashboardPage() {
                         />
                       )
                     )}
+
                   </div>
 
                   <div className="hidden sm:block">
+
                     <TransactionTable
                       transactions={
                         filteredTransactions
@@ -1549,10 +1700,13 @@ export default function DashboardPage() {
                         handleCancelTransaction
                       }
                     />
+
                   </div>
                 </>
               )}
+
             </div>
+
           </div>
         )}
 
@@ -1575,21 +1729,27 @@ export default function DashboardPage() {
                 <div className="flex items-center justify-between gap-3">
 
                   <div>
+
                     <div className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/65">
                       Arus Kas Bersih
                     </div>
 
                     <div className="text-[9px] font-medium text-white/55 mt-0.5">
-                      {selectedPeriodLabel}
+                      {
+                        selectedPeriodLabel
+                      }
                     </div>
+
                   </div>
 
                   <div className="w-9 h-9 rounded-xl bg-white/10 border border-white/10 flex items-center justify-center">
+
                     {netFlow >= 0 ? (
                       <TrendingUp className="w-4 h-4 text-[#F7E7A8]" />
                     ) : (
                       <TrendingDown className="w-4 h-4 text-[#F7E7A8]" />
                     )}
+
                   </div>
 
                 </div>
@@ -1607,6 +1767,7 @@ export default function DashboardPage() {
                 </div>
 
               </div>
+
             </div>
 
             {/* SALDO */}
@@ -1614,12 +1775,15 @@ export default function DashboardPage() {
             <div className="grid grid-cols-2 gap-3">
 
               <div className="bg-white p-4 rounded-2xl border border-[#E9E4CF] shadow-[0_4px_18px_rgba(19,78,74,0.04)]">
+
                 <div className="flex items-center gap-1.5 text-[#7B817D]">
+
                   <WalletCards className="w-3.5 h-3.5 text-[#D9B83F]" />
 
                   <span className="text-[10px] font-bold uppercase tracking-wider">
                     Saldo Awal
                   </span>
+
                 </div>
 
                 <div className="text-sm font-black text-[#183B38] mt-2 tabular-nums">
@@ -1628,15 +1792,19 @@ export default function DashboardPage() {
                       0
                   )}
                 </div>
+
               </div>
 
               <div className="bg-white p-4 rounded-2xl border border-[#E9E4CF] shadow-[0_4px_18px_rgba(19,78,74,0.04)]">
+
                 <div className="flex items-center gap-1.5 text-[#7B817D]">
+
                   <WalletCards className="w-3.5 h-3.5 text-[#0F766E]" />
 
                   <span className="text-[10px] font-bold uppercase tracking-wider">
                     Saldo Akhir
                   </span>
+
                 </div>
 
                 <div className="text-sm font-black text-[#0F766E] mt-2 tabular-nums">
@@ -1645,6 +1813,7 @@ export default function DashboardPage() {
                       0
                   )}
                 </div>
+
               </div>
 
             </div>
@@ -1660,13 +1829,17 @@ export default function DashboardPage() {
                 <div className="flex items-start justify-between gap-3">
 
                   <div>
+
                     <div className="flex items-center gap-2">
 
                       <div className="w-8 h-8 rounded-xl bg-[#F7E7A8]/45 flex items-center justify-center">
+
                         <BarChart3 className="w-4 h-4 text-[#A97800]" />
+
                       </div>
 
                       <div>
+
                         <h3 className="text-sm font-black text-[#183B38]">
                           Arus Kas Tahunan
                         </h3>
@@ -1675,14 +1848,17 @@ export default function DashboardPage() {
                           Pemasukan dan pengeluaran{' '}
                           {selectedYear}
                         </p>
+
                       </div>
 
                     </div>
+
                   </div>
 
                   <div className="flex flex-col items-end gap-1.5 shrink-0">
 
                     <div className="flex items-center gap-3 text-[9px] font-bold text-[#7B817D]">
+
                       <span className="flex items-center gap-1">
                         <span className="w-2 h-2 rounded-full bg-[#0F766E]" />
                         Masuk
@@ -1692,16 +1868,20 @@ export default function DashboardPage() {
                         <span className="w-2 h-2 rounded-full bg-[#D9B83F]" />
                         Keluar
                       </span>
+
                     </div>
 
                   </div>
+
                 </div>
 
               </div>
 
               {annualLoading ? (
                 <div className="p-8">
-                  <Loading message={`Memuat analisis ${selectedYear}...`} />
+                  <Loading
+                    message={`Memuat analisis ${selectedYear}...`}
+                  />
                 </div>
               ) : (
                 <>
@@ -1711,6 +1891,7 @@ export default function DashboardPage() {
                   <div className="grid grid-cols-3 gap-px bg-[#E9E4CF] border-b border-[#E9E4CF]">
 
                     <div className="bg-white p-3 text-center">
+
                       <div className="text-[9px] font-bold uppercase tracking-wider text-[#7B817D]">
                         Total Masuk
                       </div>
@@ -1720,9 +1901,11 @@ export default function DashboardPage() {
                           annualTotalMasuk
                         )}
                       </div>
+
                     </div>
 
                     <div className="bg-white p-3 text-center">
+
                       <div className="text-[9px] font-bold uppercase tracking-wider text-[#7B817D]">
                         Total Keluar
                       </div>
@@ -1732,16 +1915,19 @@ export default function DashboardPage() {
                           annualTotalKeluar
                         )}
                       </div>
+
                     </div>
 
                     <div className="bg-white p-3 text-center">
+
                       <div className="text-[9px] font-bold uppercase tracking-wider text-[#7B817D]">
                         Net Flow
                       </div>
 
                       <div
                         className={`text-xs sm:text-sm font-black mt-1 tabular-nums ${
-                          annualNetFlow >= 0
+                          annualNetFlow >=
+                          0
                             ? 'text-[#0F766E]'
                             : 'text-rose-600'
                         }`}
@@ -1750,6 +1936,7 @@ export default function DashboardPage() {
                           annualNetFlow
                         )}
                       </div>
+
                     </div>
 
                   </div>
@@ -1769,13 +1956,9 @@ export default function DashboardPage() {
                           <div className="absolute inset-0 flex flex-col justify-between pointer-events-none">
 
                             <div className="border-t border-dashed border-[#E9E4CF]" />
-
                             <div className="border-t border-dashed border-[#E9E4CF]" />
-
                             <div className="border-t border-dashed border-[#E9E4CF]" />
-
                             <div className="border-t border-dashed border-[#E9E4CF]" />
-
                             <div className="border-t border-[#E9E4CF]" />
 
                           </div>
@@ -1785,7 +1968,9 @@ export default function DashboardPage() {
                           <div className="absolute inset-0 flex items-end justify-between gap-2 px-1">
 
                             {annualCashData.map(
-                              (item) => {
+                              (
+                                item
+                              ) => {
 
                                 const masukHeight =
                                   item.masuk >
@@ -1824,21 +2009,27 @@ export default function DashboardPage() {
                                       <div
                                         className="group relative w-3.5 sm:w-5 rounded-t-md bg-[#0F766E] transition-all duration-500 hover:bg-[#134E4A]"
                                         style={{
-                                          height:
-                                            `${masukHeight}%`,
+                                          height: `${masukHeight}%`,
                                         }}
-                                        title={`${item.bulan} · Masuk: ${formatRupiah(item.masuk)}`}
+                                        title={`${item.bulan} · Masuk: ${formatRupiah(
+                                          item.masuk
+                                        )}`}
                                       >
                                         {item.masuk >
                                           0 && (
                                           <div className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-20 whitespace-nowrap">
+
                                             <div className="bg-[#183B38] text-white text-[9px] font-bold rounded-lg px-2 py-1.5 shadow-lg">
+
                                               Masuk
                                               <br />
+
                                               {formatRupiah(
                                                 item.masuk
                                               )}
+
                                             </div>
+
                                           </div>
                                         )}
                                       </div>
@@ -1848,21 +2039,27 @@ export default function DashboardPage() {
                                       <div
                                         className="group relative w-3.5 sm:w-5 rounded-t-md bg-[#D9B83F] transition-all duration-500 hover:bg-[#B99724]"
                                         style={{
-                                          height:
-                                            `${keluarHeight}%`,
+                                          height: `${keluarHeight}%`,
                                         }}
-                                        title={`${item.bulan} · Keluar: ${formatRupiah(item.keluar)}`}
+                                        title={`${item.bulan} · Keluar: ${formatRupiah(
+                                          item.keluar
+                                        )}`}
                                       >
                                         {item.keluar >
                                           0 && (
                                           <div className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-20 whitespace-nowrap">
+
                                             <div className="bg-[#183B38] text-white text-[9px] font-bold rounded-lg px-2 py-1.5 shadow-lg">
+
                                               Keluar
                                               <br />
+
                                               {formatRupiah(
                                                 item.keluar
                                               )}
+
                                             </div>
+
                                           </div>
                                         )}
                                       </div>
@@ -1870,6 +2067,7 @@ export default function DashboardPage() {
                                     </div>
 
                                     <div className="h-7 flex items-center justify-center mt-1">
+
                                       <span
                                         className={`text-[9px] font-bold ${
                                           item.periode ===
@@ -1882,6 +2080,7 @@ export default function DashboardPage() {
                                           item.bulan
                                         }
                                       </span>
+
                                     </div>
 
                                   </div>
@@ -1890,6 +2089,7 @@ export default function DashboardPage() {
                             )}
 
                           </div>
+
                         </div>
 
                       </div>
@@ -1910,7 +2110,9 @@ export default function DashboardPage() {
                             </div>
 
                             <div className="text-[10px] font-extrabold text-[#183B38] truncate">
-                              {highestMonth.bulan}{' '}
+                              {
+                                highestMonth.bulan
+                              }{' '}
                               {selectedYear}
                             </div>
 
@@ -1929,6 +2131,7 @@ export default function DashboardPage() {
                     )}
 
                   </div>
+
                 </>
               )}
 
@@ -1941,6 +2144,7 @@ export default function DashboardPage() {
             <div className="bg-white p-4 sm:p-5 rounded-2xl border border-[#E9E4CF] shadow-[0_4px_18px_rgba(19,78,74,0.04)] space-y-4">
 
               <div>
+
                 <h3 className="text-xs font-black text-[#183B38] uppercase tracking-wider">
                   Proporsi Arus Kas
                 </h3>
@@ -1951,6 +2155,7 @@ export default function DashboardPage() {
                     selectedPeriodLabel
                   }
                 </p>
+
               </div>
 
               <div className="space-y-3">
@@ -1987,6 +2192,7 @@ export default function DashboardPage() {
                     />
 
                   </div>
+
                 </div>
 
                 <div>
@@ -2021,10 +2227,13 @@ export default function DashboardPage() {
                     />
 
                   </div>
+
                 </div>
 
               </div>
+
             </div>
+
           </div>
         )}
 
@@ -2042,6 +2251,7 @@ export default function DashboardPage() {
                 <div className="flex items-center justify-between">
 
                   <div>
+
                     <h3 className="text-sm font-black text-[#183B38]">
                       Manajemen Pengguna
                     </h3>
@@ -2049,6 +2259,7 @@ export default function DashboardPage() {
                     <p className="text-[11px] text-[#7B817D]">
                       Kelola akses & staf kantor
                     </p>
+
                   </div>
 
                   <button
@@ -2080,6 +2291,7 @@ export default function DashboardPage() {
                         >
 
                           <div>
+
                             <div className="font-bold text-[#183B38]">
                               {u.nama}
                             </div>
@@ -2087,6 +2299,7 @@ export default function DashboardPage() {
                             <div className="text-[11px] text-[#7B817D]">
                               {u.username}
                             </div>
+
                           </div>
 
                           <div className="text-right">
@@ -2115,6 +2328,7 @@ export default function DashboardPage() {
               <div className="bg-white p-4 rounded-2xl border border-[#E9E4CF] shadow-[0_4px_18px_rgba(19,78,74,0.04)] space-y-3">
 
                 <div>
+
                   <h3 className="text-sm font-black text-[#183B38]">
                     Audit Trail Aktivitas
                   </h3>
@@ -2122,6 +2336,7 @@ export default function DashboardPage() {
                   <p className="text-[11px] text-[#7B817D]">
                     Catatan riwayat sistem kas
                   </p>
+
                 </div>
 
                 <div className="divide-y divide-[#E9E4CF]">
@@ -2165,7 +2380,9 @@ export default function DashboardPage() {
                     )}
 
                 </div>
+
               </div>
+
             </div>
           )}
 
@@ -2219,6 +2436,7 @@ export default function DashboardPage() {
                     )}
 
                   </div>
+
                 </div>
 
               </div>
@@ -2231,8 +2449,11 @@ export default function DashboardPage() {
                 </div>
 
                 <div className="flex items-center gap-1.5 text-[9px] font-bold text-[#F7E7A8]">
+
                   <span className="w-1.5 h-1.5 rounded-full bg-[#D9B83F]" />
+
                   Aktif
+
                 </div>
 
               </div>
@@ -2256,10 +2477,13 @@ export default function DashboardPage() {
                 <div className="flex items-center gap-2.5">
 
                   <div className="w-8 h-8 rounded-xl bg-[#F7E7A8]/40 flex items-center justify-center">
+
                     <Download className="w-4 h-4 text-[#A97800]" />
+
                   </div>
 
                   <div>
+
                     <div>
                       Pasang Aplikasi
                     </div>
@@ -2267,6 +2491,7 @@ export default function DashboardPage() {
                     <div className="text-[9px] text-[#7B817D] font-medium mt-0.5">
                       Tambahkan KAS KP2KP ke layar utama
                     </div>
+
                   </div>
 
                 </div>
@@ -2293,10 +2518,13 @@ export default function DashboardPage() {
                 <div className="flex items-center gap-2.5">
 
                   <div className="w-8 h-8 rounded-xl bg-rose-50 flex items-center justify-center">
+
                     <LogOut className="w-4 h-4 text-rose-600" />
+
                   </div>
 
                   <div>
+
                     <div>
                       {loggingOut
                         ? 'Keluar dari aplikasi...'
@@ -2306,6 +2534,7 @@ export default function DashboardPage() {
                     <div className="text-[9px] text-rose-400 font-medium mt-0.5">
                       Akhiri sesi akun saat ini
                     </div>
+
                   </div>
 
                 </div>
@@ -2406,6 +2635,7 @@ export default function DashboardPage() {
           </>
         }
       >
+
         <form
           id="formTransaksi"
           onSubmit={
@@ -2415,6 +2645,7 @@ export default function DashboardPage() {
         >
 
           <div>
+
             <label className="block text-[11px] font-bold text-[#183B38] uppercase mb-1">
               Tanggal Transaksi
             </label>
@@ -2435,9 +2666,11 @@ export default function DashboardPage() {
               required
               className="w-full h-10 px-3 rounded-xl border border-[#E9E4CF] bg-[#FFFDF4] text-xs text-[#183B38] focus:bg-white focus:border-[#0F766E] outline-none"
             />
+
           </div>
 
           <div>
+
             <label className="block text-[11px] font-bold text-[#183B38] uppercase mb-1">
               Jenis Arus Kas
             </label>
@@ -2447,17 +2680,20 @@ export default function DashboardPage() {
                 txForm.jenis
               }
               onChange={(
-                e: any
+                e
               ) =>
                 setTxForm({
                   ...txForm,
                   jenis:
                     e.target
-                      .value,
+                      .value as
+                      | 'MASUK'
+                      | 'KELUAR',
                 })
               }
               className="w-full h-10 px-3 rounded-xl border border-[#E9E4CF] bg-[#FFFDF4] text-xs font-bold text-[#183B38] focus:bg-white focus:border-[#0F766E] outline-none"
             >
+
               <option value="MASUK">
                 ↙ Uang Masuk (Penerimaan)
               </option>
@@ -2465,10 +2701,13 @@ export default function DashboardPage() {
               <option value="KELUAR">
                 ↗ Uang Keluar (Pengeluaran)
               </option>
+
             </select>
+
           </div>
 
           <div>
+
             <label className="block text-[11px] font-bold text-[#183B38] uppercase mb-1">
               Uraian Transaksi
             </label>
@@ -2490,9 +2729,11 @@ export default function DashboardPage() {
               required
               className="w-full h-10 px-3 rounded-xl border border-[#E9E4CF] bg-[#FFFDF4] text-xs text-[#183B38] focus:bg-white focus:border-[#0F766E] outline-none"
             />
+
           </div>
 
           <div>
+
             <label className="block text-[11px] font-bold text-[#183B38] uppercase mb-1">
               Nominal (Rp)
             </label>
@@ -2515,9 +2756,11 @@ export default function DashboardPage() {
               required
               className="w-full h-10 px-3 rounded-xl border border-[#E9E4CF] bg-[#FFFDF4] text-xs font-bold text-[#183B38] focus:bg-white focus:border-[#0F766E] outline-none"
             />
+
           </div>
 
           <div>
+
             <label className="block text-[11px] font-bold text-[#183B38] uppercase mb-1">
               Keterangan Tambahan
             </label>
@@ -2537,9 +2780,11 @@ export default function DashboardPage() {
               }
               className="w-full h-20 p-3 rounded-xl border border-[#E9E4CF] bg-[#FFFDF4] text-xs text-[#183B38] focus:bg-white focus:border-[#0F766E] outline-none resize-none"
             />
+
           </div>
 
         </form>
+
       </Modal>
 
       {/* ======================================================
@@ -2585,6 +2830,7 @@ export default function DashboardPage() {
           </>
         }
       >
+
         <form
           id="formSaldo"
           onSubmit={
@@ -2594,6 +2840,7 @@ export default function DashboardPage() {
         >
 
           <div>
+
             <label className="block text-[11px] font-bold text-[#183B38] uppercase mb-1">
               Periode
             </label>
@@ -2606,9 +2853,11 @@ export default function DashboardPage() {
               readOnly
               className="w-full h-10 px-3 rounded-xl border border-[#E9E4CF] bg-[#F5F1DF] text-xs font-bold text-[#7B817D] outline-none"
             />
+
           </div>
 
           <div>
+
             <label className="block text-[11px] font-bold text-[#183B38] uppercase mb-1">
               Saldo Awal (Rp)
             </label>
@@ -2630,9 +2879,11 @@ export default function DashboardPage() {
               required
               className="w-full h-10 px-3 rounded-xl border border-[#E9E4CF] bg-[#FFFDF4] text-xs font-bold text-[#183B38] focus:bg-white focus:border-[#0F766E] outline-none"
             />
+
           </div>
 
           <div>
+
             <label className="block text-[11px] font-bold text-[#183B38] uppercase mb-1">
               Keterangan
             </label>
@@ -2652,9 +2903,11 @@ export default function DashboardPage() {
               }
               className="w-full h-20 p-3 rounded-xl border border-[#E9E4CF] bg-[#FFFDF4] text-xs text-[#183B38] focus:bg-white focus:border-[#0F766E] outline-none resize-none"
             />
+
           </div>
 
         </form>
+
       </Modal>
 
       {/* ======================================================
@@ -2700,6 +2953,7 @@ export default function DashboardPage() {
           </>
         }
       >
+
         <form
           id="formUser"
           onSubmit={
@@ -2709,6 +2963,7 @@ export default function DashboardPage() {
         >
 
           <div>
+
             <label className="block text-[11px] font-bold text-[#183B38] uppercase mb-1">
               Nama Lengkap
             </label>
@@ -2730,9 +2985,11 @@ export default function DashboardPage() {
               required
               className="w-full h-10 px-3 rounded-xl border border-[#E9E4CF] bg-[#FFFDF4] text-xs text-[#183B38] focus:bg-white focus:border-[#0F766E] outline-none"
             />
+
           </div>
 
           <div>
+
             <label className="block text-[11px] font-bold text-[#183B38] uppercase mb-1">
               Username (NIP Pendek)
             </label>
@@ -2754,9 +3011,11 @@ export default function DashboardPage() {
               required
               className="w-full h-10 px-3 rounded-xl border border-[#E9E4CF] bg-[#FFFDF4] text-xs text-[#183B38] focus:bg-white focus:border-[#0F766E] outline-none"
             />
+
           </div>
 
           <div>
+
             <label className="block text-[11px] font-bold text-[#183B38] uppercase mb-1">
               Kata Sandi
             </label>
@@ -2778,9 +3037,11 @@ export default function DashboardPage() {
               required
               className="w-full h-10 px-3 rounded-xl border border-[#E9E4CF] bg-[#FFFDF4] text-xs text-[#183B38] focus:bg-white focus:border-[#0F766E] outline-none"
             />
+
           </div>
 
           <div>
+
             <label className="block text-[11px] font-bold text-[#183B38] uppercase mb-1">
               Peran Akses
             </label>
@@ -2799,6 +3060,7 @@ export default function DashboardPage() {
               }
               className="w-full h-10 px-3 rounded-xl border border-[#E9E4CF] bg-[#FFFDF4] text-xs font-bold text-[#183B38] focus:bg-white focus:border-[#0F766E] outline-none"
             >
+
               <option value="BENDAHARA">
                 BENDAHARA
               </option>
@@ -2810,10 +3072,13 @@ export default function DashboardPage() {
               <option value="SUPER ADMIN">
                 SUPER ADMIN
               </option>
+
             </select>
+
           </div>
 
         </form>
+
       </Modal>
 
       {/* ======================================================
