@@ -51,6 +51,7 @@ export default function DashboardPage() {
 
   // Navigation State
   const [activeTab, setActiveTab] = useState<NavTab>('beranda');
+  const [currentYear, setCurrentYear] = useState<number>(2026);
 
   // Period State
   const [periods, setPeriods] = useState<{ periode: string; label: string }[]>(
@@ -143,6 +144,7 @@ export default function DashboardPage() {
     }
 
     checkAuth();
+    setCurrentYear(new Date().getFullYear());
 
     const pendingTab = sessionStorage.getItem('dashboard_tab') as NavTab | null;
     if (pendingTab) {
@@ -223,12 +225,11 @@ export default function DashboardPage() {
 
   // Annual Analysis
   const selectedYear = (() => {
-    const fallbackYear = new Date().getFullYear();
-    if (!selectedPeriod) return fallbackYear;
+    if (!selectedPeriod) return currentYear;
     const year = Number(selectedPeriod.slice(0, 4));
     return Number.isFinite(year) && year >= 2000 && year <= 2100
       ? year
-      : fallbackYear;
+      : currentYear;
   })();
 
   const loadAnnualCashData = useCallback(async (year: number) => {
