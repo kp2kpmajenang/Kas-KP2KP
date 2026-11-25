@@ -20,15 +20,15 @@ export default function RoleBadge({
         const isBendahara = role.includes('BENDAHARA');
 
         const badgeClass = isSuper
-          ? 'bg-[#F7E7A8]/70 text-[#725B00] border-[#E5CD70]'
+          ? 'bg-[#F7E7A8]/80 text-[#6F5506] border-[#D9B83F]/45'
           : isBendahara
-          ? 'bg-[#E4F3F0] text-[#0F625C] border-[#C5E4DE]'
-          : 'bg-[#F2F3EE] text-[#59635F] border-[#E1E4DD]';
+          ? 'bg-[#0F766E]/12 text-[#0F625C] border-[#0F766E]/20'
+          : 'bg-[#143632]/8 text-[#4E6661] border-[#143632]/12';
 
         return (
           <span
             key={role}
-            className={`text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded-sm border tracking-wide ${badgeClass}`}
+            className={`rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase leading-none ${badgeClass}`}
           >
             {role}
           </span>

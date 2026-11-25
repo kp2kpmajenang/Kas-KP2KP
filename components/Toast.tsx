@@ -1,10 +1,8 @@
 'use client';
 
-import {
-  CheckCircle2,
-  AlertCircle,
-  X,
-} from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { CheckCircle2, AlertCircle, Info, X } from 'lucide-react';
 
 export interface ToastData {
   type: 'success' | 'error' | 'info';
@@ -17,41 +15,51 @@ interface ToastProps {
   onClose: () => void;
 }
 
-export default function Toast({
-  toast,
-  onClose,
-}: ToastProps) {
-  if (!toast) return null;
+export default function Toast({ toast, onClose }: ToastProps) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!toast || !mounted) return null;
 
   const isSuccess = toast.type === 'success';
   const isInfo = toast.type === 'info';
 
-  return (
-    <div className="fixed bottom-[calc(4.5rem+var(--safe-bottom))] sm:bottom-6 left-4 right-4 sm:left-auto sm:right-6 z-50 sm:max-w-sm animate-in fade-in slide-in-from-bottom duration-200">
-      <div className="relative flex items-start gap-3 p-3.5 rounded-2xl bg-[#183B38] text-white shadow-[0_12px_35px_rgba(19,78,74,0.25)] border border-white/10 overflow-hidden">
-        {/* Gold accent */}
+  return createPortal(
+    <div
+      className="fixed left-4 right-4 z-[320] sm:left-auto sm:right-6 sm:max-w-sm kas-animate-sheet"
+      style={{
+        bottom:
+          'max(94px, calc(84px + env(safe-area-inset-bottom, 0px)))',
+      }}
+      role="status"
+      aria-live="polite"
+    >
+      <div className="kas-glass-hero relative flex items-start gap-3 overflow-hidden rounded-[20px] p-3.5 text-white">
         <div
-          className={`absolute left-0 top-0 bottom-0 w-1 ${
+          className={`absolute bottom-0 left-0 top-0 w-1 ${
             isSuccess
-              ? 'bg-[#D9B83F]'
+              ? 'bg-[#8EF0C0]'
               : isInfo
-              ? 'bg-[#5CBDB3]'
-              : 'bg-[#E88D8D]'
+              ? 'bg-[#FFF0A8]'
+              : 'bg-[#FFB8C4]'
           }`}
         />
 
-        <div className="shrink-0 mt-0.5 ml-1">
+        <div className="ml-1 mt-0.5 shrink-0">
           {isSuccess ? (
-            <CheckCircle2 className="w-4 h-4 text-[#8BE0C4]" />
+            <CheckCircle2 className="h-4 w-4 text-[#8EF0C0]" />
           ) : isInfo ? (
-            <AlertCircle className="w-4 h-4 text-[#F7E7A8]" />
+            <Info className="h-4 w-4 text-[#FFF0A8]" />
           ) : (
-            <AlertCircle className="w-4 h-4 text-[#F3A7A7]" />
+            <AlertCircle className="h-4 w-4 text-[#FFB8C4]" />
           )}
         </div>
 
-        <div className="flex-1 min-w-0">
-          <div className="text-xs font-bold text-[#F7E7A8]">
+        <div className="min-w-0 flex-1">
+          <div className="text-[12.5px] font-semibold text-[#FFF0A8]">
             {toast.title ||
               (isSuccess
                 ? 'Berhasil'
@@ -59,8 +67,7 @@ export default function Toast({
                 ? 'Informasi'
                 : 'Perhatian')}
           </div>
-
-          <div className="text-[11px] text-white/75 leading-tight mt-0.5">
+          <div className="mt-0.5 text-[11.5px] leading-snug text-white/85">
             {toast.message}
           </div>
         </div>
@@ -68,11 +75,13 @@ export default function Toast({
         <button
           type="button"
           onClick={onClose}
-          className="text-white/40 hover:text-white p-0.5 rounded-sm transition-colors"
+          aria-label="Tutup notifikasi"
+          className="rounded-lg p-1 text-white/60 transition-colors hover:bg-white/10 hover:text-white"
         >
-          <X className="w-3.5 h-3.5" />
+          <X className="h-3.5 w-3.5" />
         </button>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

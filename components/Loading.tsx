@@ -11,15 +11,13 @@ export default function Loading({
 }: LoadingProps) {
   return (
     <div
-      className={`flex flex-col items-center justify-center p-8 gap-3 text-center ${className}`}
+      className={`flex flex-col items-center justify-center gap-3 p-8 text-center ${className}`}
     >
-      <div className="relative w-9 h-9">
-        <div className="absolute inset-0 rounded-full border-[3px] border-[#DDEAE7]" />
-
-        <div className="absolute inset-0 rounded-full border-[3px] border-transparent border-t-[#0F766E] border-r-[#D9B83F] animate-spin" />
+      <div className="kas-glass-orb relative flex h-11 w-11 items-center justify-center rounded-full">
+        <div className="h-6 w-6 animate-spin rounded-full border-[2.5px] border-[#0F766E]/20 border-r-[#C9A227] border-t-[#0F766E]" />
       </div>
 
-      <span className="text-xs font-semibold text-[#71807B]">
+      <span className="text-[12px] font-medium text-[#4E6661]">
         {message}
       </span>
     </div>

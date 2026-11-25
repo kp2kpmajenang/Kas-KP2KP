@@ -20,104 +20,89 @@ export default function BottomNavigation({
   onQuickAdd,
 }: BottomNavigationProps) {
   const getNavClass = (active: boolean) =>
-    `relative flex flex-col items-center gap-1 py-1 px-2.5 rounded-xl text-[10px] font-bold transition-all duration-200 ${
+    `relative flex flex-1 flex-col items-center justify-center gap-1 rounded-[18px] py-1.5 px-1.5 text-[10.5px] leading-none transition-all duration-200 ${
       active
-        ? 'text-[#0F766E]'
-        : 'text-[#8A918D] hover:text-[#41615D]'
+        ? 'bg-[#134E4A]/10 font-bold text-[#134E4A]'
+        : 'font-semibold text-[#4E6661] hover:text-[#134E4A]'
     }`;
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-xl border-t border-[#E9E4CF] px-3 py-1.5 pb-[calc(0.375rem+var(--safe-bottom))] shadow-[0_-8px_30px_rgba(19,78,74,0.06)]">
-      <div className="max-w-md mx-auto flex items-center justify-around">
+    <div
+      className="pointer-events-none fixed inset-x-0 bottom-0 z-[90] px-3.5 pt-2"
+      style={{
+        paddingBottom:
+          'max(18px, calc(env(safe-area-inset-bottom, 0px) + 12px))',
+      }}
+    >
+      <nav
+        aria-label="Navigasi Utama"
+        className="kas-glass-dock pointer-events-auto mx-auto flex max-w-md items-center justify-around gap-1 rounded-[28px] px-2 py-2"
+      >
         {/* Beranda */}
         <button
           type="button"
           onClick={() => onChangeTab('beranda')}
           className={getNavClass(activeTab === 'beranda')}
         >
-          {activeTab === 'beranda' && (
-            <span className="absolute -top-1 left-1/2 -translate-x-1/2 w-5 h-0.5 rounded-full bg-[#D9B83F]" />
-          )}
-
           <Home
-            className={`w-5 h-5 ${
-              activeTab === 'beranda'
-                ? 'stroke-[2.4]'
-                : 'stroke-[1.8]'
+            className={`h-[19px] w-[19px] ${
+              activeTab === 'beranda' ? 'stroke-[2.3]' : 'stroke-[1.8]'
             }`}
           />
           <span>Beranda</span>
         </button>
 
-        {/* Transaksi */}
+        {/* Mutasi */}
         <button
           type="button"
           onClick={() => onChangeTab('transaksi')}
           className={getNavClass(activeTab === 'transaksi')}
         >
-          {activeTab === 'transaksi' && (
-            <span className="absolute -top-1 left-1/2 -translate-x-1/2 w-5 h-0.5 rounded-full bg-[#D9B83F]" />
-          )}
-
           <FileText
-            className={`w-5 h-5 ${
-              activeTab === 'transaksi'
-                ? 'stroke-[2.4]'
-                : 'stroke-[1.8]'
+            className={`h-[19px] w-[19px] ${
+              activeTab === 'transaksi' ? 'stroke-[2.3]' : 'stroke-[1.8]'
             }`}
           />
           <span>Mutasi</span>
         </button>
 
-        {/* FAB Quick Add for Bendahara */}
+        {/* Tombol Aksi Utama Tengah (Bendahara) */}
         {isBendahara && onQuickAdd && (
           <button
             type="button"
             onClick={onQuickAdd}
-            className="relative -mt-5 w-12 h-12 rounded-full bg-gradient-to-br from-[#134E4A] via-[#0F766E] to-[#D9B83F] text-white border-[3px] border-white flex items-center justify-center shadow-[0_8px_22px_rgba(15,118,110,0.28)] active:scale-95 hover:shadow-[0_10px_26px_rgba(15,118,110,0.34)] transition-all duration-200"
+            aria-label="Catat Transaksi"
             title="Catat Transaksi"
+            className="mx-1 flex h-11 w-11 shrink-0 items-center justify-center rounded-[16px] bg-gradient-to-br from-[#134E4A] via-[#0F766E] to-[#1A8A7F] text-white shadow-[0_8px_18px_rgba(19,78,74,0.34)] ring-1 ring-white/40 transition-all duration-200 hover:brightness-105 active:scale-95"
           >
-            <div className="absolute inset-[3px] rounded-full border border-white/15" />
-            <Plus className="relative w-6 h-6 stroke-[2.5]" />
+            <Plus className="h-5 w-5 stroke-[2.5]" />
           </button>
         )}
 
-        {/* Analisis / Laporan */}
+        {/* Analisis */}
         <button
           type="button"
           onClick={() => onChangeTab('analisis')}
           className={getNavClass(activeTab === 'analisis')}
         >
-          {activeTab === 'analisis' && (
-            <span className="absolute -top-1 left-1/2 -translate-x-1/2 w-5 h-0.5 rounded-full bg-[#D9B83F]" />
-          )}
-
           <PieChart
-            className={`w-5 h-5 ${
-              activeTab === 'analisis'
-                ? 'stroke-[2.4]'
-                : 'stroke-[1.8]'
+            className={`h-[19px] w-[19px] ${
+              activeTab === 'analisis' ? 'stroke-[2.3]' : 'stroke-[1.8]'
             }`}
           />
           <span>Analisis</span>
         </button>
 
-        {/* Kelola */}
+        {/* Kelola (Super Admin) */}
         {isSuperAdmin && (
           <button
             type="button"
             onClick={() => onChangeTab('kelola')}
             className={getNavClass(activeTab === 'kelola')}
           >
-            {activeTab === 'kelola' && (
-              <span className="absolute -top-1 left-1/2 -translate-x-1/2 w-5 h-0.5 rounded-full bg-[#D9B83F]" />
-            )}
-
             <Shield
-              className={`w-5 h-5 ${
-                activeTab === 'kelola'
-                  ? 'stroke-[2.4]'
-                  : 'stroke-[1.8]'
+              className={`h-[19px] w-[19px] ${
+                activeTab === 'kelola' ? 'stroke-[2.3]' : 'stroke-[1.8]'
               }`}
             />
             <span>Kelola</span>
@@ -130,20 +115,14 @@ export default function BottomNavigation({
           onClick={() => onChangeTab('akun')}
           className={getNavClass(activeTab === 'akun')}
         >
-          {activeTab === 'akun' && (
-            <span className="absolute -top-1 left-1/2 -translate-x-1/2 w-5 h-0.5 rounded-full bg-[#D9B83F]" />
-          )}
-
           <User
-            className={`w-5 h-5 ${
-              activeTab === 'akun'
-                ? 'stroke-[2.4]'
-                : 'stroke-[1.8]'
+            className={`h-[19px] w-[19px] ${
+              activeTab === 'akun' ? 'stroke-[2.3]' : 'stroke-[1.8]'
             }`}
           />
           <span>Akun</span>
         </button>
-      </div>
-    </nav>
+      </nav>
+    </div>
   );
 }

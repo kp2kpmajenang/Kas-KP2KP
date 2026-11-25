@@ -1,18 +1,13 @@
 'use client';
 
-import {
-  ArrowDownLeft,
-  ArrowUpRight,
-  XCircle,
-} from 'lucide-react';
-
+import { ArrowDownLeft, ArrowUpRight, XCircle } from 'lucide-react';
 import { formatRupiah } from '@/lib/utils/format';
 import { TransaksiItem } from '@/lib/finance/transactions';
 
 interface TransactionCardProps {
   transaction: TransaksiItem;
   isBendahara: boolean;
-  onCancel?: (id: string) => void;
+  onCancel?: (tx: TransaksiItem) => void;
 }
 
 export default function TransactionCard({
@@ -24,45 +19,47 @@ export default function TransactionCard({
   const isBatal = transaction.status === 'BATAL';
 
   return (
-    <div className="flex items-center justify-between gap-3 p-3.5 bg-white rounded-2xl border border-[#EAE9DD] hover:border-[#CFE1DD] transition-colors shadow-[0_2px_10px_rgba(19,78,74,0.03)]">
-      {/* Icon */}
+    <div className="flex items-center justify-between gap-3 py-3 transition-colors">
+      {/* Orb Ikon Kaca */}
       <div
-        className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
+        className={`kas-glass-orb flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${
           isBatal
-            ? 'bg-[#F2F3EE] text-[#9AA19D]'
+            ? 'text-[#7A8C88]'
             : isMasuk
-            ? 'bg-[#E5F4F0] text-[#0F766E]'
-            : 'bg-[#FBEDED] text-[#C65B5B]'
+            ? 'text-[#0F766E]'
+            : 'text-[#9F3542]'
         }`}
       >
         {isMasuk ? (
-          <ArrowDownLeft className="w-5 h-5" />
+          <ArrowDownLeft className="h-4 w-4" />
         ) : (
-          <ArrowUpRight className="w-5 h-5" />
+          <ArrowUpRight className="h-4 w-4" />
         )}
       </div>
 
-      {/* Details */}
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-1.5 flex-wrap">
+      {/* Detail */}
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-1.5">
           <span
             title={transaction.uraian}
-            className="text-xs sm:text-sm font-bold text-[#233E3A] truncate"
+            className={`truncate text-[13px] font-semibold ${
+              isBatal ? 'text-[#7A8C88] line-through' : 'text-[#143632]'
+            }`}
           >
             {transaction.uraian}
           </span>
 
           {isBatal && (
-            <span className="text-[9px] font-black uppercase px-1.5 py-0.5 bg-[#F1EEEE] text-[#8C6A6A] rounded-sm shrink-0">
-              BATAL
+            <span className="shrink-0 rounded-md bg-[#9F3542]/10 px-1.5 py-0.5 text-[10px] font-bold uppercase text-[#9F3542]">
+              Batal
             </span>
           )}
         </div>
 
-        <div className="text-[11px] text-[#7F8985] flex items-center gap-2 mt-0.5">
+        <div className="mt-0.5 flex items-center gap-1.5 text-[11px] text-[#4E6661]">
           <span>{transaction.tanggal}</span>
-          <span>•</span>
-          <span className="font-mono text-[10px] text-[#A0A7A3] truncate">
+          <span className="opacity-40">•</span>
+          <span className="truncate font-mono text-[10.5px] opacity-80">
             {transaction.idTransaksi}
           </span>
         </div>
@@ -70,36 +67,35 @@ export default function TransactionCard({
         {transaction.keterangan && (
           <div
             title={transaction.keterangan}
-            className="text-[10px] text-[#9AA19D] italic truncate mt-0.5"
+            className="mt-0.5 truncate text-[11px] italic text-[#4E6661]/80"
           >
             {transaction.keterangan}
           </div>
         )}
       </div>
 
-      {/* Amount */}
-      <div className="text-right shrink-0">
+      {/* Nominal & Aksi */}
+      <div className="shrink-0 text-right">
         <div
-          className={`text-xs sm:text-sm font-black tabular-nums ${
+          className={`kas-num text-[13px] font-medium ${
             isBatal
-              ? 'text-[#A1A6A3] line-through'
+              ? 'text-[#7A8C88] line-through'
               : isMasuk
               ? 'text-[#0F766E]'
-              : 'text-[#C65B5B]'
+              : 'text-[#9F3542]'
           }`}
         >
-          {isMasuk ? '+ ' : '- '}
-          {formatRupiah(transaction.nominal)}
+          {isMasuk ? '+' : '-'} {formatRupiah(transaction.nominal)}
         </div>
 
         {isBendahara && !isBatal && onCancel && (
           <button
             type="button"
-            onClick={() => onCancel(transaction.idTransaksi)}
-            className="mt-1 text-[10px] font-bold text-[#B85454] hover:text-[#923D3D] bg-[#FBEDED] hover:bg-[#F6DDDD] px-2 py-0.5 rounded-md inline-flex items-center gap-1 transition-colors"
+            onClick={() => onCancel(transaction)}
+            className="mt-1 inline-flex items-center gap-1 rounded-lg bg-[#9F3542]/10 px-2 py-0.5 text-[10.5px] font-semibold text-[#9F3542] transition-colors hover:bg-[#9F3542]/18"
             title="Batalkan transaksi"
           >
-            <XCircle className="w-3 h-3" />
+            <XCircle className="h-3 w-3" />
             <span>Batal</span>
           </button>
         )}

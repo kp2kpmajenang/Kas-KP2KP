@@ -7,7 +7,7 @@ import { XCircle } from 'lucide-react';
 interface TransactionTableProps {
   transactions: TransaksiItem[];
   isBendahara: boolean;
-  onCancel?: (id: string) => void;
+  onCancel?: (tx: TransaksiItem) => void;
 }
 
 export default function TransactionTable({
@@ -16,27 +16,22 @@ export default function TransactionTable({
   onCancel,
 }: TransactionTableProps) {
   return (
-    <div className="w-full overflow-x-auto border border-[#E7E6DB] rounded-2xl bg-white shadow-[0_2px_12px_rgba(19,78,74,0.03)]">
-      <table className="w-full text-left text-xs border-collapse">
+    <div className="w-full overflow-x-auto">
+      <table className="w-full border-collapse text-left text-[12.5px]">
         <thead>
-          <tr className="bg-[#FFFDF5] border-b border-[#E7E6DB] text-[#687772] font-bold uppercase text-[10px] tracking-wider">
-            <th className="py-2.5 px-3.5">Tanggal</th>
-            <th className="py-2.5 px-3">ID Transaksi</th>
-            <th className="py-2.5 px-3">Jenis</th>
-            <th className="py-2.5 px-3">Uraian</th>
-            <th className="py-2.5 px-3.5 text-right">
-              Nominal
-            </th>
-
+          <tr className="border-b border-[#143632]/10 text-[11px] font-bold text-[#4E6661]">
+            <th className="py-2.5 pr-3">Tanggal</th>
+            <th className="px-3 py-2.5">ID</th>
+            <th className="px-3 py-2.5">Jenis</th>
+            <th className="px-3 py-2.5">Uraian</th>
+            <th className="py-2.5 pl-3 text-right">Nominal</th>
             {isBendahara && (
-              <th className="py-2.5 px-3 text-center">
-                Aksi
-              </th>
+              <th className="py-2.5 pl-3 text-center">Aksi</th>
             )}
           </tr>
         </thead>
 
-        <tbody className="divide-y divide-[#F0EFE7]">
+        <tbody className="divide-y divide-[#143632]/8">
           {transactions.map((tx) => {
             const isMasuk = tx.jenis === 'MASUK';
             const isBatal = tx.status === 'BATAL';
@@ -44,68 +39,72 @@ export default function TransactionTable({
             return (
               <tr
                 key={tx.idTransaksi}
-                className="hover:bg-[#FFFDF5] transition-colors"
+                className="transition-colors hover:bg-white/45"
               >
-                <td className="py-3 px-3.5 whitespace-nowrap text-[#687772] font-medium">
+                <td className="whitespace-nowrap py-3 pr-3 text-[12px] font-medium text-[#4E6661]">
                   {tx.tanggal}
                 </td>
 
-                <td className="py-3 px-3 whitespace-nowrap font-mono text-[11px] text-[#9AA19D]">
+                <td className="whitespace-nowrap px-3 py-3 font-mono text-[11px] text-[#4E6661]/80">
                   {tx.idTransaksi}
                 </td>
 
-                <td className="py-3 px-3 whitespace-nowrap">
+                <td className="whitespace-nowrap px-3 py-3">
                   <span
-                    className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-extrabold ${
+                    className={`inline-block rounded-full px-2.5 py-0.5 text-[10.5px] font-bold ${
                       isBatal
-                        ? 'bg-[#F1F2EE] text-[#777E7A]'
+                        ? 'bg-[#143632]/8 text-[#7A8C88]'
                         : isMasuk
-                        ? 'bg-[#E5F4F0] text-[#0F766E]'
-                        : 'bg-[#FBEDED] text-[#B85454]'
+                        ? 'bg-[#0F766E]/12 text-[#0F766E]'
+                        : 'bg-[#9F3542]/12 text-[#9F3542]'
                     }`}
                   >
-                    {isMasuk ? 'MASUK' : 'KELUAR'}
+                    {isBatal ? 'BATAL' : isMasuk ? 'MASUK' : 'KELUAR'}
                   </span>
                 </td>
 
-                <td className="py-3 px-3 text-[#29443F] font-semibold max-w-xs">
-                  <div>{tx.uraian}</div>
-
+                <td className="max-w-xs px-3 py-3">
+                  <div
+                    className={`text-[13px] font-semibold ${
+                      isBatal
+                        ? 'text-[#7A8C88] line-through'
+                        : 'text-[#143632]'
+                    }`}
+                  >
+                    {tx.uraian}
+                  </div>
                   {tx.keterangan && (
-                    <div className="text-[10px] text-[#9AA19D] font-normal italic">
+                    <div className="mt-0.5 text-[11px] italic text-[#4E6661]/80">
                       {tx.keterangan}
                     </div>
                   )}
                 </td>
 
                 <td
-                  className={`py-3 px-3.5 text-right font-black tabular-nums whitespace-nowrap ${
+                  className={`kas-num whitespace-nowrap py-3 pl-3 text-right text-[13px] font-medium ${
                     isBatal
-                      ? 'text-[#A1A6A3] line-through'
+                      ? 'text-[#7A8C88] line-through'
                       : isMasuk
                       ? 'text-[#0F766E]'
-                      : 'text-[#C65B5B]'
+                      : 'text-[#9F3542]'
                   }`}
                 >
-                  {isMasuk ? '+ ' : '- '}
-                  {formatRupiah(tx.nominal)}
+                  {isMasuk ? '+' : '-'} {formatRupiah(tx.nominal)}
                 </td>
 
                 {isBendahara && (
-                  <td className="py-3 px-3 text-center whitespace-nowrap">
+                  <td className="whitespace-nowrap py-3 pl-3 text-center">
                     {!isBatal && onCancel ? (
                       <button
                         type="button"
-                        onClick={() =>
-                          onCancel(tx.idTransaksi)
-                        }
-                        className="text-[11px] font-bold text-[#B85454] hover:text-[#923D3D] bg-[#FBEDED] hover:bg-[#F6DDDD] px-2.5 py-1 rounded-md inline-flex items-center gap-1 transition-colors"
+                        onClick={() => onCancel(tx)}
+                        className="inline-flex items-center gap-1 rounded-lg bg-[#9F3542]/10 px-2.5 py-1 text-[11px] font-semibold text-[#9F3542] transition-colors hover:bg-[#9F3542]/18"
                       >
-                        <XCircle className="w-3.5 h-3.5" />
+                        <XCircle className="h-3.5 w-3.5" />
                         <span>Batal</span>
                       </button>
                     ) : (
-                      <span className="text-[#C8CCC8]">-</span>
+                      <span className="text-[#4E6661]/40">-</span>
                     )}
                   </td>
                 )}

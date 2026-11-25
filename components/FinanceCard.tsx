@@ -6,12 +6,14 @@ import {
   EyeOff,
   ArrowDownLeft,
   ArrowUpRight,
-  Settings,
+  SlidersHorizontal,
 } from 'lucide-react';
 import { formatRupiah } from '@/lib/utils/format';
 
 interface FinanceCardProps {
   saldoAkhir: number;
+  totalMasuk: number;
+  totalKeluar: number;
   periodeLabel: string;
   isBendahara: boolean;
   onTambahMasuk?: () => void;
@@ -21,6 +23,8 @@ interface FinanceCardProps {
 
 export default function FinanceCard({
   saldoAkhir,
+  totalMasuk,
+  totalKeluar,
   periodeLabel,
   isBendahara,
   onTambahMasuk,
@@ -30,95 +34,93 @@ export default function FinanceCard({
   const [hideBalance, setHideBalance] = useState(false);
 
   return (
-    <div className="relative overflow-hidden rounded-[22px] bg-gradient-to-br from-[#134E4A] via-[#0F766E] to-[#166E68] p-5 text-white shadow-[0_14px_34px_rgba(19,78,74,0.22)]">
-      {/* Decorative Glow */}
-      <div className="pointer-events-none absolute -right-12 -top-16 h-44 w-44 rounded-full bg-[#D9B83F]/16 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-20 -left-10 h-40 w-40 rounded-full bg-white/8 blur-3xl" />
-
-      {/* Decorative watermark */}
-      <div className="pointer-events-none absolute -right-2 -top-2 select-none text-[58px] font-black tracking-tighter text-white/[0.045]">
-        KAS
-      </div>
-
+    <section className="kas-glass-hero relative overflow-hidden rounded-[24px] p-5 text-white">
       {/* Header */}
-      <div className="relative flex items-start justify-between mb-5">
+      <div className="relative flex items-start justify-between gap-3">
         <div>
-          <div className="mb-2 flex items-center gap-1.5">
-            <div className="h-1.5 w-6 rounded-full bg-gradient-to-r from-[#F7E7A8] to-[#D9B83F]" />
-            <div className="h-1.5 w-2 rounded-full bg-white/40" />
+          <div className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-2.5 py-0.5 text-[10.5px] font-semibold text-[#FFF0A8]">
+            <span className="h-1.5 w-1.5 rounded-full bg-[#FFF0A8]" />
+            <span>{periodeLabel}</span>
           </div>
 
-          <div className="text-[10px] font-bold tracking-[0.16em] text-white/65 uppercase">
-            KAS OPERASIONAL KANTOR
+          <div className="mt-2.5 text-[11.5px] font-medium text-white/75">
+            Saldo Kas Tersedia
           </div>
 
-          <div className="mt-0.5 text-xs font-bold text-[#F7E7A8]">
-            {periodeLabel}
+          <div className="kas-num mt-0.5 text-[26px] font-bold leading-tight text-white sm:text-[28px]">
+            {hideBalance ? 'Rp ••••••••' : formatRupiah(saldoAkhir)}
           </div>
         </div>
 
         <button
           type="button"
-          onClick={() => setHideBalance(!hideBalance)}
-          className="flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-white/10 hover:bg-white/15 text-white transition-colors"
+          onClick={() => setHideBalance((prev) => !prev)}
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/12 text-white transition-colors hover:bg-white/20"
+          aria-label={hideBalance ? 'Tampilkan Saldo' : 'Sembunyikan Saldo'}
           title={hideBalance ? 'Tampilkan Saldo' : 'Sembunyikan Saldo'}
         >
           {hideBalance ? (
-            <EyeOff className="w-4 h-4" />
+            <EyeOff className="h-4 w-4" />
           ) : (
-            <Eye className="w-4 h-4" />
+            <Eye className="h-4 w-4" />
           )}
         </button>
       </div>
 
-      {/* Saldo */}
-      <div className="relative mb-5">
-        <div className="text-[11px] font-medium text-white/60">
-          Saldo Kas Tersedia
+      {/* Sub-metrik Terpadu (DESIGN.md Pattern 1) */}
+      <div className="relative mt-4 grid grid-cols-2 divide-x divide-white/20 border-t border-white/20 pt-3.5">
+        <div className="pr-3">
+          <div className="flex items-center gap-1 text-[11px] font-medium text-white/75">
+            <ArrowDownLeft className="h-3.5 w-3.5 text-[#8EF0C0]" />
+            <span>Pemasukan</span>
+          </div>
+          <div className="kas-num mt-0.5 text-[13.5px] font-semibold text-[#8EF0C0]">
+            {hideBalance ? 'Rp ••••••' : formatRupiah(totalMasuk)}
+          </div>
         </div>
 
-        <div className="mt-1 text-[28px] sm:text-[30px] font-black tracking-tight tabular-nums text-white">
-          {hideBalance ? 'Rp ••••••••' : formatRupiah(saldoAkhir)}
+        <div className="pl-3.5">
+          <div className="flex items-center gap-1 text-[11px] font-medium text-white/75">
+            <ArrowUpRight className="h-3.5 w-3.5 text-[#FFB8C4]" />
+            <span>Pengeluaran</span>
+          </div>
+          <div className="kas-num mt-0.5 text-[13.5px] font-semibold text-[#FFB8C4]">
+            {hideBalance ? 'Rp ••••••' : formatRupiah(totalKeluar)}
+          </div>
         </div>
       </div>
 
-      {/* Quick Actions */}
+      {/* Quick Actions Bendahara */}
       {isBendahara && (
-        <div className="relative flex items-center gap-2 border-t border-white/12 pt-3">
+        <div className="relative mt-4 grid grid-cols-3 gap-2 border-t border-white/20 pt-3.5">
           <button
             type="button"
             onClick={onTambahMasuk}
-            className="flex-1 flex flex-col items-center justify-center gap-1 rounded-xl border border-white/8 bg-white/8 hover:bg-white/14 active:bg-white/18 py-2 px-1 text-center transition-colors"
+            className="flex items-center justify-center gap-1.5 rounded-[14px] border border-white/18 bg-white/12 px-2.5 py-2 text-[11.5px] font-semibold text-white transition-all hover:bg-white/20 active:scale-[0.98]"
           >
-            <ArrowDownLeft className="w-4 h-4 text-[#8BE0C4]" />
-            <span className="text-[10px] font-extrabold text-white">
-              Masuk
-            </span>
+            <ArrowDownLeft className="h-3.5 w-3.5 text-[#8EF0C0]" />
+            <span>Masuk</span>
           </button>
 
           <button
             type="button"
             onClick={onTambahKeluar}
-            className="flex-1 flex flex-col items-center justify-center gap-1 rounded-xl border border-white/8 bg-white/8 hover:bg-white/14 active:bg-white/18 py-2 px-1 text-center transition-colors"
+            className="flex items-center justify-center gap-1.5 rounded-[14px] border border-white/18 bg-white/12 px-2.5 py-2 text-[11.5px] font-semibold text-white transition-all hover:bg-white/20 active:scale-[0.98]"
           >
-            <ArrowUpRight className="w-4 h-4 text-[#F3A7A7]" />
-            <span className="text-[10px] font-extrabold text-white">
-              Keluar
-            </span>
+            <ArrowUpRight className="h-3.5 w-3.5 text-[#FFB8C4]" />
+            <span>Keluar</span>
           </button>
 
           <button
             type="button"
             onClick={onEditSaldoAwal}
-            className="flex-1 flex flex-col items-center justify-center gap-1 rounded-xl border border-white/8 bg-white/8 hover:bg-white/14 active:bg-white/18 py-2 px-1 text-center transition-colors"
+            className="flex items-center justify-center gap-1.5 rounded-[14px] border border-white/18 bg-white/12 px-2.5 py-2 text-[11.5px] font-semibold text-white transition-all hover:bg-white/20 active:scale-[0.98]"
           >
-            <Settings className="w-4 h-4 text-[#F7E7A8]" />
-            <span className="text-[10px] font-extrabold text-white">
-              Saldo Awal
-            </span>
+            <SlidersHorizontal className="h-3.5 w-3.5 text-[#FFF0A8]" />
+            <span>Saldo Awal</span>
           </button>
         </div>
       )}
-    </div>
+    </section>
   );
 }
