@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { ChevronRight, Download, LogOut, ShieldCheck } from 'lucide-react';
 import ProfileAvatar from '@/components/ProfileAvatar';
 
@@ -20,7 +21,11 @@ export default function AkunTab({
   onOpenInstallGuide,
   onRequestLogout,
 }: AkunTabProps) {
-  const currentYear = new Date().getFullYear();
+  const [currentYear, setCurrentYear] = useState(2026);
+
+  useEffect(() => {
+    setCurrentYear(new Date().getFullYear());
+  }, []);
 
   return (
     <div className="space-y-4">
