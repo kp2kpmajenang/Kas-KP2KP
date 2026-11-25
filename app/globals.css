@@ -1,39 +1,247 @@
 @import "tailwindcss";
 
 :root {
+  /* Safe area PWA iOS/iPhone */
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
+
+  /* Permukaan & Teks — Silk Terang (Hijau Emerald & Emas) */
+  --kas-canvas: #edf4f1;
+  --kas-bg: #f6fbf8;
+  --kas-sf: #ffffff;
+  --kas-tx: #143632;
+  --kas-mu: #4e6661;
+  --kas-ln: #d6e3de;
+  --kas-primary: #134e4a;
+  --kas-teal: #0f766e;
+  --kas-gold: #c9a227;
+  --kas-gold-soft: #f7e7a8;
+  --kas-on: #ffffff;
+
+  /* 5 Warna Semantik */
+  --kas-gr: #0f766e;       /* Positif / Pemasukan / Sukses */
+  --kas-rd: #9f3542;       /* Negatif / Pengeluaran / Bahaya */
+  --kas-ol: #9a7b1c;       /* Saldo / Emas / Netral hangat */
+  --kas-tr: #257a7e;       /* Info / Transfer */
+  --kas-am: #b47a26;       /* Peringatan (>=80%) */
 }
 
-body {
-  background-color: #f8fafc;
-  color: #0f172a;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  padding-top: var(--safe-top);
-  margin: 0;
+@layer base {
+  html,
+  body {
+    background-color: var(--kas-bg);
+    color: var(--kas-tx);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
+      "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    letter-spacing: normal;
+    -webkit-font-smoothing: antialiased;
+    margin: 0;
+  }
 }
 
-/* Tabular figures for aligned financial numbers */
+/* Tabular figures untuk angka finansial rata kolom */
+.kas-num,
 .tabular-nums {
   font-variant-numeric: tabular-nums;
+  letter-spacing: normal;
 }
 
-/* Custom scrollbar for clean banking UI */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Safe area atas untuk PWA iPhone (viewportFit: 'cover') */
+.kas-safe-top {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+/* ============================================================
+   SILK TERANG GLASSMORPHISM — HIJAU EMERALD & EMAS HANGAT
+   ============================================================ */
+
+/* Latar Kanvas Silk Terang (Emerald Mint & Champagne Gold) */
+.kas-silk-canvas {
+  background:
+    radial-gradient(ellipse 85% 48% at 10% 8%, rgba(116, 206, 189, 0.52) 0%, rgba(116, 206, 189, 0) 64%),
+    radial-gradient(ellipse 80% 48% at 92% 16%, rgba(242, 212, 124, 0.54) 0%, rgba(242, 212, 124, 0) 62%),
+    radial-gradient(ellipse 85% 50% at 18% 58%, rgba(148, 220, 205, 0.44) 0%, rgba(148, 220, 205, 0) 64%),
+    radial-gradient(ellipse 85% 50% at 88% 82%, rgba(246, 223, 150, 0.50) 0%, rgba(246, 223, 150, 0) 64%),
+    linear-gradient(170deg, #eff9f5 0%, #fcfaf1 50%, #edf7f3 100%);
+}
+
+/* Hero Card: Hijau Emerald Tinted Glass dengan kilau Emas */
+.kas-glass-hero {
+  background:
+    radial-gradient(circle at 92% 8%, rgba(242, 210, 114, 0.34) 0%, rgba(242, 210, 114, 0) 48%),
+    radial-gradient(circle at 10% 92%, rgba(94, 212, 192, 0.26) 0%, rgba(94, 212, 192, 0) 52%),
+    linear-gradient(140deg, rgba(19, 78, 74, 0.90) 0%, rgba(15, 108, 100, 0.82) 55%, rgba(20, 122, 112, 0.78) 100%);
+  backdrop-filter: blur(24px) saturate(175%);
+  -webkit-backdrop-filter: blur(24px) saturate(175%);
+  border: 1px solid rgba(255, 255, 255, 0.36);
+  box-shadow:
+    0 16px 36px -8px rgba(19, 78, 74, 0.30),
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.36);
+}
+
+/* Kaca Transparan Bening (Donut Card, Search Bar, Tab Segmented, Bento 2x2) */
+.kas-glass-clear {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.52) 0%, rgba(255, 255, 255, 0.26) 100%);
+  backdrop-filter: blur(22px) saturate(180%);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.80);
+  box-shadow:
+    0 10px 28px -8px rgba(19, 78, 74, 0.10),
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.92);
+}
+
+/* Kaca Satin Lembut (Daftar Item, Form Row, Container Login) */
+.kas-glass-soft {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.78) 0%, rgba(255, 255, 255, 0.52) 100%);
+  backdrop-filter: blur(22px) saturate(170%);
+  -webkit-backdrop-filter: blur(22px) saturate(170%);
+  border: 1px solid rgba(255, 255, 255, 0.88);
+  box-shadow:
+    0 8px 24px -8px rgba(19, 78, 74, 0.09),
+    inset 0 1px 0 rgba(255, 255, 255, 0.96);
+}
+
+/* Kaca Emas Hangat (Callout, Highlight, Info Penting) */
+.kas-glass-gold {
+  background: linear-gradient(135deg, rgba(249, 233, 173, 0.68) 0%, rgba(255, 252, 240, 0.50) 100%);
+  backdrop-filter: blur(20px) saturate(170%);
+  -webkit-backdrop-filter: blur(20px) saturate(170%);
+  border: 1px solid rgba(255, 255, 255, 0.88);
+  box-shadow:
+    0 8px 22px -8px rgba(154, 123, 28, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+
+/* Kaca Emerald-Gold (Kartu Tautan / Profil / Aksen) */
+.kas-glass-emerald {
+  background: linear-gradient(135deg, rgba(164, 226, 214, 0.52) 0%, rgba(242, 251, 248, 0.56) 58%, rgba(249, 234, 180, 0.46) 100%);
+  backdrop-filter: blur(20px) saturate(175%);
+  -webkit-backdrop-filter: blur(20px) saturate(175%);
+  border: 1px solid rgba(255, 255, 255, 0.88);
+  box-shadow:
+    0 10px 24px -8px rgba(19, 78, 74, 0.13),
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.96);
+}
+
+/* Lingkaran Kaca Orb untuk Ikon / Simbol */
+.kas-glass-orb {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.86) 0%, rgba(255, 255, 255, 0.38) 100%);
+  backdrop-filter: blur(14px) saturate(170%);
+  -webkit-backdrop-filter: blur(14px) saturate(170%);
+  border: 1px solid rgba(255, 255, 255, 0.94);
+  box-shadow:
+    0 4px 12px -3px rgba(19, 78, 74, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+/* Floating Glass Bottom Navigation Dock */
+.kas-glass-dock {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.82) 0%, rgba(255, 255, 255, 0.62) 100%);
+  backdrop-filter: blur(28px) saturate(190%);
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.94);
+  box-shadow:
+    0 14px 34px -8px rgba(19, 78, 74, 0.18),
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.98);
+}
+
+/* Bottom Sheet & Modal Kaca */
+.kas-glass-sheet {
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.94) 0%, rgba(242, 251, 247, 0.90) 55%, rgba(253, 249, 234, 0.90) 100%);
+  backdrop-filter: blur(30px) saturate(185%);
+  -webkit-backdrop-filter: blur(30px) saturate(185%);
+  border-top: 1px solid rgba(255, 255, 255, 0.96);
+  box-shadow: 0 -18px 44px rgba(19, 78, 74, 0.22);
+}
+
+/* Tile Berwarna Tinted Glass (untuk Swipeable Bento Carousel) */
+.kas-tile-income {
+  background: linear-gradient(145deg, rgba(15, 118, 110, 0.86) 0%, rgba(19, 88, 82, 0.76) 100%);
+  backdrop-filter: blur(18px) saturate(170%);
+  -webkit-backdrop-filter: blur(18px) saturate(170%);
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  box-shadow: 0 10px 22px -8px rgba(15, 118, 110, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.42);
+}
+
+.kas-tile-expense {
+  background: linear-gradient(145deg, rgba(159, 53, 66, 0.86) 0%, rgba(128, 39, 51, 0.76) 100%);
+  backdrop-filter: blur(18px) saturate(170%);
+  -webkit-backdrop-filter: blur(18px) saturate(170%);
+  border: 1px solid rgba(255, 255, 255, 0.40);
+  box-shadow: 0 10px 22px -8px rgba(159, 53, 66, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.40);
+}
+
+.kas-tile-gold {
+  background: linear-gradient(145deg, rgba(168, 132, 32, 0.86) 0%, rgba(136, 104, 22, 0.76) 100%);
+  backdrop-filter: blur(18px) saturate(170%);
+  -webkit-backdrop-filter: blur(18px) saturate(170%);
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  box-shadow: 0 10px 22px -8px rgba(154, 123, 28, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.42);
+}
+
+.kas-tile-emerald {
+  background: linear-gradient(145deg, rgba(24, 96, 98, 0.86) 0%, rgba(18, 72, 76, 0.76) 100%);
+  backdrop-filter: blur(18px) saturate(170%);
+  -webkit-backdrop-filter: blur(18px) saturate(170%);
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  box-shadow: 0 10px 22px -8px rgba(19, 78, 74, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.42);
+}
+
+/* ============================================================
+   ANIMASI HALUS (Modal, Sheet, Toast)
+   ============================================================ */
+
+@keyframes kasFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes kasSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.kas-animate-fade {
+  animation: kasFadeIn 180ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.kas-animate-sheet {
+  animation: kasSlideUp 220ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Custom scrollbar selaras tema Emerald-Gold */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: rgba(19, 78, 74, 0.04);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: rgba(19, 78, 74, 0.22);
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: rgba(19, 78, 74, 0.36);
 }
